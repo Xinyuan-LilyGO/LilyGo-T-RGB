@@ -8,7 +8,7 @@
 #include "esp_lcd_panel_rgb.h"
 #include "esp_lcd_panel_vendor.h"
 #include "factory_ui.h"
-#include "ft3267.h"
+#include "TouchLib.h"
 #include "img.h"
 #include "lvgl.h"
 #include "pin_config.h"
@@ -66,6 +66,7 @@ DRAM_ATTR static const lcd_init_cmd_t st_init_cmds[] = {
     {0, {0}, 0xff}};
 
 XL9535 xl;
+
 
 bool touch_pin_get_int = false;
 void deep_sleep(void);

@@ -90,6 +90,22 @@ void scan_iic(void) {
   }
 }
 
+void print_chip_info(void) {
+  Serial.print("Chip: ");
+  Serial.println(ESP.getChipModel());
+  Serial.print("ChipRevision: ");
+  Serial.println(ESP.getChipRevision());
+  Serial.print("Psram size: ");
+  Serial.print(ESP.getPsramSize() / 1024);
+  Serial.println("KB");
+  Serial.print("Flash size: ");
+  Serial.print(ESP.getFlashChipSize() / 1024);
+  Serial.println("KB");
+  Serial.print("CPU frequency: ");
+  Serial.print(ESP.getCpuFreqMHz());
+  Serial.println("MHz");
+}
+
 void setup() {
   // put your setup code here, to run once:
   pinMode(BAT_VOLT_PIN, ANALOG);

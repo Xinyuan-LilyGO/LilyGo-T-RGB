@@ -5,12 +5,20 @@
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_rgb.h"
 #include "esp_lcd_panel_vendor.h"
-#include "ft3267.h"
 #include "img.h"
-// #include "lv_conf.h"
 #include "lvgl.h"
 #include "pin_config.h"
 #include <Arduino.h>
+
+#define TOUCH_MODULE_CST820
+// #define TOUCH_MODULE_FT3267
+
+#if defined(TOUCH_MODULE_FT3267)
+#include "ft3267.h"
+#elif defined(TOUCH_MODULE_CST820)
+#define TOUCH_MODULES_CST_SELF
+#include "TouchLib.h"
+#endif
 
 typedef struct {
   uint8_t cmd;
@@ -24,7 +32,7 @@ DRAM_ATTR static const lcd_init_cmd_t st_init_cmds[] = {
     {0xC1, {0x0b, 0x02}, 0x02},
     {0xC2, {0x07, 0x02}, 0x02},
     {0xCC, {0x10}, 0x01},
-    {0xCD, {0x08}, 0x01}, //用565时屏蔽    666打开
+    {0xCD, {0x08}, 0x01}, // 用565时屏蔽    666打开
     {0xb0, {0x00, 0x11, 0x16, 0x0e, 0x11, 0x06, 0x05, 0x09, 0x08, 0x21, 0x06, 0x13, 0x10, 0x29, 0x31, 0x18}, 0x10},
     {0xb1, {0x00, 0x11, 0x16, 0x0e, 0x11, 0x07, 0x05, 0x09, 0x09, 0x21, 0x05, 0x13, 0x11, 0x2a, 0x31, 0x18}, 0x10},
     {0xFF, {0x77, 0x01, 0x00, 0x00, 0x11}, 0x05},
@@ -64,6 +72,9 @@ DRAM_ATTR static const lcd_init_cmd_t st_init_cmds[] = {
     {0, {0}, 0xff}};
 
 XL9535 xl;
+#if defined(TOUCH_MODULE_CST820)
+TouchLib touch(Wire, IIC_SDA_PIN, IIC_SCL_PIN, CTS820_SLAVE_ADDRESS);
+#endif
 
 bool touch_pin_get_int = false;
 void tft_init(void);
@@ -116,13 +127,22 @@ static void example_lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_
 }
 
 static void lv_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data) {
-  uint8_t touch_points_num;
-  uint16_t x, y;
+
   if (touch_pin_get_int) {
+
+#if defined(TOUCH_MODULE_FT3267)
+    uint8_t touch_points_num;
+    uint16_t x, y;
     ft3267_read_pos(&touch_points_num, &x, &y);
-    data->state = LV_INDEV_STATE_PR;
     data->point.x = x;
     data->point.y = y;
+#elif defined(TOUCH_MODULE_CST820)
+    touch.read();
+    TP_Point t = touch.getPoint(0);
+    data->point.x = t.x;
+    data->point.y = t.y;
+#endif
+    data->state = LV_INDEV_STATE_PR;
     touch_pin_get_int = false;
   } else {
     data->state = LV_INDEV_STATE_REL;
@@ -151,7 +171,12 @@ void setup() {
   xl.digitalWrite(TP_RES_PIN, 0);
   delay(200);
   xl.digitalWrite(TP_RES_PIN, 1);
+  
+#if defined(TOUCH_MODULE_FT3267)
   ft3267_init(Wire);
+#elif defined(TOUCH_MODULE_CST820)
+  touch.init();
+#endif
   tft_init();
   esp_lcd_panel_handle_t panel_handle = NULL;
   esp_lcd_rgb_panel_config_t panel_config = {

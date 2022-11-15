@@ -1,20 +1,18 @@
-#include "HTTPClient.h"
-#include "SD_MMC.h"
-#include "WiFi.h"
+
 #include "Wire.h"
 #include "XL9535_driver.h"
+#include "demos/lv_demos.h"
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_rgb.h"
 #include "esp_lcd_panel_vendor.h"
-#include "factory_ui.h"
 #include "img.h"
 #include "lvgl.h"
 #include "pin_config.h"
 #include <Arduino.h>
 
-// #define TOUCH_MODULE_CST820
-#define TOUCH_MODULE_FT3267
+#define TOUCH_MODULE_CST820
+// #define TOUCH_MODULE_FT3267
 
 #if defined(TOUCH_MODULE_FT3267)
 #include "ft3267.h"
@@ -80,12 +78,9 @@ TouchLib touch(Wire, IIC_SDA_PIN, IIC_SCL_PIN, CTS820_SLAVE_ADDRESS);
 #endif
 
 bool touch_pin_get_int = false;
-void deep_sleep(void);
-void SD_init(void);
 void tft_init(void);
 void lcd_cmd(const uint8_t cmd);
 void lcd_data(const uint8_t *data, int len);
-void wifi_task(void *param);
 
 void scan_iic(void) {
   byte error, address;
@@ -134,13 +129,14 @@ static void example_lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_
 
 static void lv_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data) {
 
-  touch_point_t p = {0};
   if (touch_pin_get_int) {
+
 #if defined(TOUCH_MODULE_FT3267)
     uint8_t touch_points_num;
-    ft3267_read_pos(&touch_points_num, &p.x, &p.y);
-    data->point.x = p.x;
-    data->point.y = p.y;
+    uint16_t x, y;
+    ft3267_read_pos(&touch_points_num, &x, &y);
+    data->point.x = x;
+    data->point.y = y;
 #elif defined(TOUCH_MODULE_CST820)
     touch.read();
     TP_Point t = touch.getPoint(0);
@@ -152,7 +148,6 @@ static void lv_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data
   } else {
     data->state = LV_INDEV_STATE_REL;
   }
-  lv_msg_send(MSG_TOUCH_UPDATE, &p);
 }
 
 void setup() {
@@ -162,7 +157,7 @@ void setup() {
   // put your setup code here, to run once:
   pinMode(BAT_VOLT_PIN, ANALOG);
 
-  Wire.begin(IIC_SDA_PIN, IIC_SCL_PIN, (uint32_t)400000);
+  Wire.begin(IIC_SDA_PIN, IIC_SCL_PIN, (uint32_t)800000);
   Serial.begin(115200);
   xl.begin();
   uint8_t pin = (1 << PWR_EN_PIN) | (1 << LCD_CS_PIN) | (1 << TP_RES_PIN) | (1 << LCD_SDA_PIN) | (1 << LCD_CLK_PIN) |
@@ -173,16 +168,17 @@ void setup() {
   print_chip_info();
   pinMode(EXAMPLE_PIN_NUM_BK_LIGHT, OUTPUT);
   digitalWrite(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_ON_LEVEL);
-  SD_init();
 
   xl.digitalWrite(TP_RES_PIN, 0);
   delay(200);
   xl.digitalWrite(TP_RES_PIN, 1);
+
 #if defined(TOUCH_MODULE_FT3267)
   ft3267_init(Wire);
 #elif defined(TOUCH_MODULE_CST820)
   touch.init();
 #endif
+
   tft_init();
   esp_lcd_panel_handle_t panel_handle = NULL;
   esp_lcd_rgb_panel_config_t panel_config = {
@@ -199,6 +195,7 @@ void setup() {
               .vsync_pulse_width = 1,
               .vsync_back_porch = 30,
               .vsync_front_porch = 20,
+
               .flags =
                   {
                       .pclk_active_neg = 1,
@@ -276,22 +273,14 @@ void setup() {
   attachInterrupt(
       TP_INT_PIN, [] { touch_pin_get_int = true; }, FALLING);
 
-  Serial.println("Display LVGL Scatter Chart");
-
-  ui_begin();
-  xTaskCreatePinnedToCore(wifi_task, "wifi_task", 1024 * 6, NULL, 1, NULL, 0);
+  lv_demo_music();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  static uint32_t Millis;
+
   delay(2);
   lv_timer_handler();
-  if (millis() - Millis > 50) {
-    float v = (analogRead(BAT_VOLT_PIN) * 2 * 3.3) / 4096;
-    lv_msg_send(MSG_BAT_VOLT_UPDATE, &v);
-    Millis = millis();
-  }
 }
 
 void lcd_send_data(uint8_t data) {
@@ -354,162 +343,4 @@ void tft_init(void) {
     cmd++;
   }
   Serial.println("Register setup complete");
-}
-
-void SD_init(void) {
-  xl.digitalWrite(SD_CS_PIN, 1); // To use SDIO one-line mode, you need to pull the CS pin high
-  SD_MMC.setPins(SD_CLK_PIN, SD_CMD_PIN, SD_D0_PIN);
-  if (!SD_MMC.begin("/sdcard", true)) {
-    Serial.println("Card Mount Failed");
-    return;
-  }
-
-  uint8_t cardType = SD_MMC.cardType();
-  if (cardType == CARD_NONE) {
-    Serial.println("No SD card attached");
-    return;
-  }
-
-  Serial.print("SD Card Type: ");
-
-  if (cardType == CARD_MMC)
-    Serial.println("MMC");
-  else if (cardType == CARD_SD)
-    Serial.println("SDSC");
-  else if (cardType == CARD_SDHC)
-    Serial.println("SDHC");
-  else
-    Serial.println("UNKNOWN");
-
-  uint64_t cardSize = SD_MMC.cardSize() / (1024 * 1024);
-  Serial.printf("SD Card Size: %lluMB\n", cardSize);
-}
-// This task is used to test WIFI, http test
-void wifi_task(void *param) {
-  String str;
-  HTTPClient http_client;
-  WiFi.disconnect();
-  WiFi.mode(WIFI_STA);
-  delay(100);
-  Serial.println("scan start");
-  str = "wifi scan start";
-  lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
-  delay(1000);
-  // WiFi.scanNetworks will return the number of networks found
-  int n = WiFi.scanNetworks();
-  Serial.println("scan done");
-  str = "scan done\r\n";
-  lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
-  if (n == 0) {
-    Serial.println("no networks found");
-    str = "no networks found";
-    lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
-  } else {
-    Serial.print(n);
-    Serial.println(" networks found");
-    str += n;
-    str += " networks found\r\n";
-    for (int i = 0; i < n; ++i) {
-      // Print SSID and RSSI for each network found
-      Serial.print(i + 1);
-      Serial.print(": ");
-      Serial.print(WiFi.SSID(i));
-      Serial.print(" (");
-      Serial.print(WiFi.RSSI(i));
-      Serial.print(")");
-      Serial.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN) ? " " : "*");
-
-      str += i + 1;
-      str += ": ";
-      str += WiFi.SSID(i);
-      str += " (";
-      str += WiFi.RSSI(i);
-      str += ")";
-      str += (WiFi.encryptionType(i) == WIFI_AUTH_OPEN) ? " " : "*";
-      str += "\r\n";
-    }
-  }
-  str += "\r\n";
-  lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
-  Serial.println("");
-  WiFi.disconnect();
-
-  delay(3000);
-  uint32_t last_m = millis();
-  str = "connecting to wifi\r\n";
-  str += "SSID : " WIFI_SSID "\r\n";
-  str += "PASSWORD : " WIFI_PASSWORD "\r\n";
-  lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
-
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
-    vTaskDelay(100);
-    str += ".";
-    lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
-  }
-  Serial.printf("\r\n-- wifi connect success! --\r\n");
-  Serial.printf("It takes %d milliseconds\r\n", millis() - last_m);
-
-  str += "\r\n-- wifi connect success! --\r\n";
-  str += "It takes ";
-  str += millis() - last_m;
-  str += "milliseconds\r\n";
-  lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
-
-  delay(2000);
-  String rsp;
-  bool is_get_http = false;
-  do {
-    http_client.begin("https://www.arduino.cc/");
-    str = "getting https://www.arduino.cc/";
-    lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
-
-    int http_code = http_client.GET();
-    Serial.println(http_code);
-    if (http_code > 0) {
-      Serial.printf("HTTP get code: %d\n", http_code);
-      if (http_code == HTTP_CODE_OK) {
-        rsp = http_client.getString();
-        Serial.println(rsp);
-        is_get_http = true;
-        str += rsp;
-        lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
-
-      } else {
-        Serial.printf("fail to get http client,code:%d\n", http_code);
-      }
-    } else {
-      Serial.println("HTTP GET failed. Try again");
-      str = "HTTP GET failed. Try again";
-      lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
-    }
-    delay(3000);
-  } while (!is_get_http);
-  WiFi.disconnect();
-  http_client.end();
-
-  str = "#00ff00 WIFI detection function completed #";
-  lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
-
-  vTaskDelete(NULL);
-}
-
-void deep_sleep(void) {
-  WiFi.disconnect();
-  detachInterrupt(TP_INT_PIN);
-  xl.pinMode8(0, 0xff, INPUT);
-  xl.pinMode8(1, 0xff, INPUT);
-  xl.read_all_reg();
-  // If the SD card is initialized, it needs to be unmounted.
-  if (SD_MMC.cardSize())
-    SD_MMC.end();
-
-  digitalWrite(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL);
-
-  Serial.println("Enter deep sleep");
-  delay(1000);
-
-  esp_sleep_enable_ext0_wakeup((gpio_num_t)TP_INT_PIN, 0);
-  esp_deep_sleep_start();
 }

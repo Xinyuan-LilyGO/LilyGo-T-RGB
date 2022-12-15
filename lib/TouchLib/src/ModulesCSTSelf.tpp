@@ -35,12 +35,14 @@
 #include "TouchLibCommon.tpp"
 #include "TouchLibInterface.hpp"
 
-class TouchLibCSTSelf : public TouchLibCommon<TouchLibCSTSelf>, public TouchLibInterface, public TouchLibGesture {
+class TouchLibCSTSelf : public TouchLibCommon<TouchLibCSTSelf>, public TouchLibInterface, public TouchLibGesture
+{
   friend class TouchLibCommon<TouchLibCSTSelf>;
 
 public:
 #if defined(ARDUINO)
-  TouchLibCSTSelf(TwoWire &w, int sda = SDA, int scl = SCL, uint8_t addr = CTS826_SLAVE_ADDRESS, int rst = -1) {
+  TouchLibCSTSelf(TwoWire &w, int sda = SDA, int scl = SCL, uint8_t addr = CTS826_SLAVE_ADDRESS, int rst = -1)
+  {
     __wire = &w;
     __sda = sda;
     __scl = scl;
@@ -49,7 +51,8 @@ public:
   }
 #endif
 
-  TouchLibCSTSelf() {
+  TouchLibCSTSelf()
+  {
 #if defined(ARDUINO)
     __wire = &Wire;
     __sda = SDA;
@@ -59,7 +62,8 @@ public:
     __addr = CTS826_SLAVE_ADDRESS;
   }
 
-  ~TouchLibCSTSelf() {
+  ~TouchLibCSTSelf()
+  {
     log_i("~TouchLibCSTSelf");
     deinit();
   }
@@ -70,16 +74,25 @@ public:
 
   bool enableSleep() { return this->writeRegister(SLEEP_REG, (uint8_t)(0x03)); }
 
-  bool read() {
+  bool read()
+  {
     this->readRegister(WORK_MODE_REG, raw_data, sizeof(raw_data));
+    // Serial.print("raw_data ");
+    // for (int i = 0; i < sizeof(raw_data); i++)
+    // {
+    //   Serial.printf("0x%02X ,", raw_data[i]);
+    // }
+    // Serial.println();
     return raw_data[TOUCH_NUM_REG] > 0;
   }
 
   uint8_t getPointNum() { return raw_data[TOUCH_NUM_REG] & 0x0f; }
 
-  TP_Point getPoint(uint8_t n) {
+  TP_Point getPoint(uint8_t n)
+  {
     TP_Point t;
-    switch (n) {
+    switch (n)
+    {
     case 0:
       t.state = raw_data[TOUCH1_XH_REG] >> 6;
       t.x = COMBINE_H4L8(TOUCH1_XH_REG, TOUCH1_XL_REG);
@@ -96,8 +109,11 @@ public:
     }
     t.id = n;
 
-    if (rotation == 0) {
-    } else if (rotation == 1) {
+    if (rotation == 0)
+    {
+    }
+    else if (rotation == 1)
+    {
       uint16_t tmp = t.x;
       t.x = t.y;
       t.y = tmp;
@@ -111,12 +127,14 @@ public:
 
   bool isEnableGesture() { return this->readRegister(GES_STATE_REG); }
 
-  bool enableGesture() {
+  bool enableGesture()
+  {
     uint8_t t = 0x01;
     return this->writeRegister(GES_STATE_REG, t);
   }
 
-  bool disableGesture() {
+  bool disableGesture()
+  {
     uint8_t t = 0x00;
     return this->writeRegister(GES_STATE_REG, t);
   }

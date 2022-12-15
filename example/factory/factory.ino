@@ -13,8 +13,8 @@
 #include "pin_config.h"
 #include <Arduino.h>
 
-// #define TOUCH_MODULE_CST820
-#define TOUCH_MODULE_FT3267
+#define TOUCH_MODULE_CST820
+// #define TOUCH_MODULE_FT3267
 
 #if defined(TOUCH_MODULE_FT3267)
 #include "ft3267.h"
@@ -135,17 +135,18 @@ static void example_lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_
 static void lv_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data) {
 
   touch_point_t p = {0};
-  if (touch_pin_get_int) {
+  // if (touch_pin_get_int) {
 #if defined(TOUCH_MODULE_FT3267)
     uint8_t touch_points_num;
     ft3267_read_pos(&touch_points_num, &p.x, &p.y);
     data->point.x = p.x;
     data->point.y = p.y;
 #elif defined(TOUCH_MODULE_CST820)
-    touch.read();
+    if(touch.read()){
+      // touch.read();
     TP_Point t = touch.getPoint(0);
-    data->point.x = t.x;
-    data->point.y = t.y;
+    data->point.x = p.x = t.x;
+    data->point.y = p.y = t.y;
 #endif
     data->state = LV_INDEV_STATE_PR;
     touch_pin_get_int = false;
@@ -178,6 +179,8 @@ void setup() {
   xl.digitalWrite(TP_RES_PIN, 0);
   delay(200);
   xl.digitalWrite(TP_RES_PIN, 1);
+  delay(200);
+  scan_iic();
 #if defined(TOUCH_MODULE_FT3267)
   ft3267_init(Wire);
 #elif defined(TOUCH_MODULE_CST820)
@@ -359,7 +362,7 @@ void tft_init(void) {
 void SD_init(void) {
   xl.digitalWrite(SD_CS_PIN, 1); // To use SDIO one-line mode, you need to pull the CS pin high
   SD_MMC.setPins(SD_CLK_PIN, SD_CMD_PIN, SD_D0_PIN);
-  if (!SD_MMC.begin("/sdcard", true)) {
+  if (!SD_MMC.begin("/sdcard", true, true)) {
     Serial.println("Card Mount Failed");
     return;
   }

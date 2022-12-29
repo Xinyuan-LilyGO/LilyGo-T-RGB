@@ -135,20 +135,22 @@ static void example_lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_
 static void lv_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data) {
 
   touch_point_t p = {0};
-  // if (touch_pin_get_int) {
+  if (touch_pin_get_int) {
 #if defined(TOUCH_MODULE_FT3267)
     uint8_t touch_points_num;
     ft3267_read_pos(&touch_points_num, &p.x, &p.y);
     data->point.x = p.x;
     data->point.y = p.y;
+    data->state = (touch_points_num > 0) ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+
 #elif defined(TOUCH_MODULE_CST820)
     if(touch.read()){
       // touch.read();
     TP_Point t = touch.getPoint(0);
     data->point.x = p.x = t.x;
     data->point.y = p.y = t.y;
-#endif
     data->state = LV_INDEV_STATE_PR;
+#endif
     touch_pin_get_int = false;
   } else {
     data->state = LV_INDEV_STATE_REL;

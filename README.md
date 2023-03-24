@@ -1,5 +1,10 @@
 <h1 align = "center"> 🌟T-RGB🌟</h1>
 
+## News
+
+1. Easy to use RGB panel library, organized by [fablabnbg/TRGBArduinoSupport](https://github.com/fablabnbg/TRGBArduinoSupport),This is more recommended for novices
+
+
 ## Description
 
 `T-RGB` is a development board whose main control chip is ESP32-S3. It is equipped with a `2.1-inch LCD` color screen (3SPI&RGB interface) and `FT3267` touch chip. It has TF card reading and writing function and is equipped with a programmable button and a set of IIC pins. It can be powered with a lithium battery and charged with a USB. You can use the ESP32S3 directly for USB communication or programming.
@@ -12,9 +17,9 @@
 
 ## Product 📷
 
-|  Product |  Product Link |
-| :--------: | :---------: |
-| T-RGB |  [AliExpress](https://www.aliexpress.us/item/1005004778542414.html)   |
+| Product |                            Product Link                            |
+| :-----: | :----------------------------------------------------------------: |
+|  T-RGB  | [AliExpress](https://www.aliexpress.us/item/1005004778542414.html) |
 
 ## Quick Start
 

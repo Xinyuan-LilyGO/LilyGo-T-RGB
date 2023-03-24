@@ -103,7 +103,7 @@ public:
 protected:
   int readRegister(uint8_t reg) {
     uint8_t val = 0;
-    if (thisReadRegCallback) {
+    if (thisReadRegCallback != nullptr) {
       if (thisReadRegCallback(__addr, reg, &val, 1) != 0) {
         return 0;
       }
@@ -122,7 +122,28 @@ protected:
 #endif
     return -1;
   }
-
+  int readRegister(uint16_t reg) {
+    uint8_t val = 0;
+    if (thisReadRegCallback != nullptr) {
+      if (thisReadRegCallback(__addr, reg, &val, 1) != 0) {
+        return 0;
+      }
+      return val;
+    }
+#if defined(ARDUINO)
+    if (__wire) {
+      __wire->beginTransmission(__addr);
+      __wire->write((uint8_t)(reg >> 8));
+      __wire->write((uint8_t)(reg & 0xff));
+      if (__wire->endTransmission() != 0) {
+        return -1;
+      }
+      __wire->requestFrom(__addr, 1U);
+      return __wire->read();
+    }
+#endif
+    return -1;
+  }
   int writeRegister(uint8_t reg, uint8_t val) {
     if (thisWriteRegCallback) {
       return thisWriteRegCallback(__addr, reg, &val, 1);

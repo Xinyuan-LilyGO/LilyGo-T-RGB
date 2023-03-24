@@ -4,7 +4,7 @@
 #define WIFI_SSID                      "xinyuandianzi"
 #define WIFI_PASSWORD                  "AA15994823428"
 
-#define EXAMPLE_LCD_PIXEL_CLOCK_HZ     (18 * 1000 * 1000)
+#define EXAMPLE_LCD_PIXEL_CLOCK_HZ     (8 * 1000 * 1000)
 #define EXAMPLE_LCD_BK_LIGHT_ON_LEVEL  1
 #define EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL !EXAMPLE_LCD_BK_LIGHT_ON_LEVEL
 #define EXAMPLE_PIN_NUM_BK_LIGHT       46

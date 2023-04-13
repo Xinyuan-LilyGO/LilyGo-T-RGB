@@ -144,7 +144,6 @@ XL9535 xl;
 OneButton button(0, true);
 
 bool click = false;
-bool touch_pin_get_int = false;
 void deep_sleep(void);
 void SD_init(void);
 void tft_init(void);
@@ -226,7 +225,6 @@ static void lv_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data
         data->point.x = p.x = t.x;
         data->point.y = p.y = t.y;
         data->state = LV_INDEV_STATE_PR;
-        touch_pin_get_int = false;
     } else {
         data->state = LV_INDEV_STATE_REL;
     }
@@ -234,45 +232,73 @@ static void lv_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data
     lv_msg_send(MSG_TOUCH_UPDATE, &p);
 }
 
+void waitInterruptReady()
+{
+#if defined(USING_2_8_INC_GT911)
+    //Wait for the GT911 interrupt signal to be ready
+    while (!digitalRead(TP_INT_PIN)) {
+        touch.read(); delay(10);
+    }
+#endif
+}
+
 void setup()
 {
     static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
     static lv_disp_drv_t disp_drv;      // contains callback functions
     static lv_indev_drv_t indev_drv;
+
+    Serial.begin(115200);
+
     // put your setup code here, to run once:
     pinMode(BAT_VOLT_PIN, ANALOG);
 
-    Wire.begin(IIC_SDA_PIN, IIC_SCL_PIN, (uint32_t)400000);
-    Serial.begin(115200);
+    Wire.begin(IIC_SDA_PIN, IIC_SCL_PIN);
+
+
     xl.begin();
+
     uint8_t pin = (1 << PWR_EN_PIN) | (1 << LCD_CS_PIN) | (1 << TP_RES_PIN) | (1 << LCD_SDA_PIN) | (1 << LCD_CLK_PIN) |
                   (1 << LCD_RST_PIN) | (1 << SD_CS_PIN);
 
     xl.pinMode8(0, pin, OUTPUT);
-    xl.digitalWrite(PWR_EN_PIN, 1);
+    xl.digitalWrite(PWR_EN_PIN, HIGH);
+
     print_chip_info();
+
     pinMode(EXAMPLE_PIN_NUM_BK_LIGHT, OUTPUT);
     digitalWrite(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_ON_LEVEL);
+
     SD_init();
 
 #ifdef USING_2_8_INC_GT911
+    //Reset GT911
+    xl.pinMode(TP_RES_PIN, OUTPUT);
     pinMode(TP_INT_PIN, OUTPUT);
-    digitalWrite(TP_INT_PIN, 0); //! Set GT911 IIC address
+    digitalWrite(TP_INT_PIN, LOW);
+    xl.digitalWrite(TP_RES_PIN, LOW);
+    delayMicroseconds(120);
+    xl.digitalWrite(TP_RES_PIN, HIGH);
+    delay(8);
+    pinMode(TP_INT_PIN, INPUT);
+
+    waitInterruptReady();
+
+#else
+    xl.digitalWrite(TP_RES_PIN, LOW);
+    delay(200);
+    xl.digitalWrite(TP_RES_PIN, HIGH);
+    delay(200);
 #endif
 
-    xl.digitalWrite(TP_RES_PIN, 0);
-    delay(200);
-    xl.digitalWrite(TP_RES_PIN, 1);
-    delay(200);
-
     scan_iic();
-
 
 #if defined(USING_2_1_INC_FT3267)
     ft3267_init(Wire);
 #elif defined(USING_2_8_INC_GT911) || defined(USING_2_1_INC_CST820)
     touch.init();
 #endif
+
     tft_init();
     esp_lcd_panel_handle_t panel_handle = NULL;
     esp_lcd_rgb_panel_config_t panel_config = {
@@ -358,11 +384,6 @@ void setup()
     indev_drv.read_cb = lv_touchpad_read;
     lv_indev_drv_register(&indev_drv);
 
-    pinMode(TP_INT_PIN, OPEN_DRAIN);
-    attachInterrupt( TP_INT_PIN, [] {
-        touch_pin_get_int = true;
-    },
-    CHANGE);
 
 
     //Test screen color
@@ -380,16 +401,18 @@ void setup()
         click = true;
     });
 
+    //Wait for the GT911 interrupt signal to be ready
+    waitInterruptReady();
 
-    int i = 0;
+    int i = 1;
     while (i <= 3) {
-        if (click) {
+        if (click || !digitalRead(TP_INT_PIN)) {
             click = false;
             lv_img_set_src(img, photo[i]);
-            Serial.println(i);
             i++;
+            waitInterruptReady();
         }
-        Serial.println(digitalRead(TP_INT_PIN));
+
         button.tick();
         lv_task_handler();
         delay(5);
@@ -627,10 +650,30 @@ void wifi_task(void *param)
 void deep_sleep(void)
 {
     WiFi.disconnect();
-    detachInterrupt(TP_INT_PIN);
+
+    Serial.println("DEEP SLEEP !!!!");
+
+#ifdef USING_2_8_INC_GT911
+    // After setting touch to sleep, touch wakeup cannot be used, it needs to be changed to button wakeup, or timing wakeup
+    // pinMode(TP_INT_PIN, OUTPUT);
+    // digitalWrite(TP_INT_PIN, LOW); //Before touch to set sleep, it is necessary to set INT to LOW
+    // touch.enableSleep();
+
+    pinMode(TP_INT_PIN, INPUT);
+    while (!digitalRead(TP_INT_PIN)) {
+        Serial.println("Wait touch release!");
+        // It is necessary to read the touch message, otherwise the interrupt level will remain at 0
+        touch.read();
+        delay(200);
+    }
+    delay(2000);
+    Serial.println("Touch release!!!");
+
+#else
     xl.pinMode8(0, 0xff, INPUT);
     xl.pinMode8(1, 0xff, INPUT);
-    xl.read_all_reg();
+#endif
+
     // If the SD card is initialized, it needs to be unmounted.
     if (SD_MMC.cardSize())
         SD_MMC.end();
@@ -640,6 +683,9 @@ void deep_sleep(void)
     Serial.println("Enter deep sleep");
     delay(1000);
 
-    esp_sleep_enable_ext0_wakeup((gpio_num_t)TP_INT_PIN, 0);
+    // After setting touch to sleep, touch wakeup cannot be used, it needs to be changed to button wakeup, or timing wakeup
+    // esp_sleep_enable_ext1_wakeup(1ULL << BOOT_BTN_PIN, ESP_EXT1_WAKEUP_ALL_LOW);
+
+    esp_sleep_enable_ext1_wakeup(1ULL << TP_INT_PIN, ESP_EXT1_WAKEUP_ALL_LOW);
     esp_deep_sleep_start();
 }

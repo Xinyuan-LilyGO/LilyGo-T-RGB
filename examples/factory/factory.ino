@@ -143,7 +143,14 @@ DRAM_ATTR static const lcd_init_cmd_t st_init_cmds[] = {
 XL9535 xl;
 OneButton button(0, true);
 
+const int backlightPin = EXAMPLE_PIN_NUM_BK_LIGHT;
+const int pwmChannel = 0;
+const int freq = 1000;
+const int resolution = 8;
 bool click = false;
+TaskHandle_t pvCreatedTask;
+
+
 void deep_sleep(void);
 void SD_init(void);
 void tft_init(void);
@@ -265,9 +272,6 @@ void setup()
     xl.digitalWrite(PWR_EN_PIN, HIGH);
 
     print_chip_info();
-
-    pinMode(EXAMPLE_PIN_NUM_BK_LIGHT, OUTPUT);
-    digitalWrite(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_ON_LEVEL);
 
     SD_init();
 
@@ -404,6 +408,18 @@ void setup()
     //Wait for the GT911 interrupt signal to be ready
     waitInterruptReady();
 
+    lv_task_handler();
+
+    //Use ledc adjust blacklight
+    ledcSetup(pwmChannel, freq, resolution);
+    ledcAttachPin(backlightPin, pwmChannel);
+
+    // Adjust backlight to maximum
+    for (int i = 0; i <= 255; i++) {
+        ledcWrite(pwmChannel, i);
+        delay(5);
+    }
+
     int i = 1;
     while (i <= 3) {
         if (click || !digitalRead(TP_INT_PIN)) {
@@ -423,8 +439,7 @@ void setup()
 
     ui_begin();
 
-
-    xTaskCreatePinnedToCore(wifi_task, "wifi_task", 1024 * 6, NULL, 1, NULL, 0);
+    xTaskCreate(wifi_task, "wifi_task", 1024 * 6, NULL, 1, &pvCreatedTask);
 }
 
 void loop()
@@ -649,6 +664,8 @@ void wifi_task(void *param)
 
 void deep_sleep(void)
 {
+    vTaskDelete(pvCreatedTask);
+
     WiFi.disconnect();
 
     Serial.println("DEEP SLEEP !!!!");
@@ -674,7 +691,11 @@ void deep_sleep(void)
     if (SD_MMC.cardSize())
         SD_MMC.end();
 
-    digitalWrite(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL);
+    //turn off blacklight
+    for (int i = 255; i >= 0 ; i--) {
+        ledcWrite(pwmChannel, i);
+        delay(5);
+    }
 
     Serial.println("Enter deep sleep");
     delay(1000);

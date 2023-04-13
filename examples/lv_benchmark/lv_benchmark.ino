@@ -9,9 +9,10 @@
 #include "pin_config.h"
 #include <Arduino.h>
 
- #define USING_2_1_INC_CST820     1           //  The 2.1 inch display screen uses the CST820 touch driver chip by default
-// #define USING_2_8_INC_GT911      1           //  The 2.8 inch display screen uses the GT911 touch drive chip by default
-// #define USING_2_1_INC_FT3267     1           //  The FT3267 touch version has been discontinued
+// #define USING_2_1_INC_CST820     1           //  Full circle 2.1 inches using CST820 touch screen
+// #define USING_2_8_INC_GT911      1           //  Full circle 2.8 inches using GT911 touch screen
+// #define USING_2_1_INC_FT3267     1           //  Half circle 2.1 inches use FT3267 touch screen
+
 
 typedef struct {
     uint8_t cmd;

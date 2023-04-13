@@ -85,104 +85,106 @@
 
 TwoWire *_Wrie = NULL;
 
-static inline esp_err_t ft3267_read_byte(uint8_t reg_addr, uint8_t *data) {
-  // return i2c_bus_read_byte(ft3267_handle, reg_addr, data);
-  _Wrie->beginTransmission(FT5x06_ADDR);
-  _Wrie->write(reg_addr);
-  _Wrie->endTransmission();
-  uint8_t bytesReceived = _Wrie->requestFrom(FT5x06_ADDR, 1);
-  if (bytesReceived)
-    _Wrie->readBytes(data, bytesReceived);
-  return 0;
+static inline esp_err_t ft3267_read_byte(uint8_t reg_addr, uint8_t *data)
+{
+    // return i2c_bus_read_byte(ft3267_handle, reg_addr, data);
+    _Wrie->beginTransmission(FT5x06_ADDR);
+    _Wrie->write(reg_addr);
+    _Wrie->endTransmission();
+    uint8_t bytesReceived = _Wrie->requestFrom(FT5x06_ADDR, 1);
+    if (bytesReceived)
+        _Wrie->readBytes(data, bytesReceived);
+    return 0;
 }
 
-static inline esp_err_t ft3267_read_bytes(uint8_t reg_addr, size_t data_len, uint8_t *data) {
-  // return i2c_bus_read_bytes(ft3267_handle, reg_addr, data_len, data);
-  _Wrie->beginTransmission(FT5x06_ADDR);
-  _Wrie->write(reg_addr);
-  _Wrie->endTransmission();
-  uint8_t bytesReceived = _Wrie->requestFrom(FT5x06_ADDR, data_len);
-  uint8_t index = 0;
-  while (_Wrie->available())
-    data[index++] = _Wrie->read();
-  return 0;
+static inline esp_err_t ft3267_read_bytes(uint8_t reg_addr, size_t data_len, uint8_t *data)
+{
+    // return i2c_bus_read_bytes(ft3267_handle, reg_addr, data_len, data);
+    _Wrie->beginTransmission(FT5x06_ADDR);
+    _Wrie->write(reg_addr);
+    _Wrie->endTransmission();
+    uint8_t bytesReceived = _Wrie->requestFrom(FT5x06_ADDR, data_len);
+    uint8_t index = 0;
+    while (_Wrie->available())
+        data[index++] = _Wrie->read();
+    return 0;
 }
 
-static inline esp_err_t ft3267_write_byte(uint8_t reg_addr, uint8_t data) {
-  _Wrie->beginTransmission(FT5x06_ADDR);
-  _Wrie->write(reg_addr);
-  _Wrie->write(data);
-  _Wrie->endTransmission();
-  return 0;
+static inline esp_err_t ft3267_write_byte(uint8_t reg_addr, uint8_t data)
+{
+    _Wrie->beginTransmission(FT5x06_ADDR);
+    _Wrie->write(reg_addr);
+    _Wrie->write(data);
+    _Wrie->endTransmission();
+    return 0;
 }
 
-esp_err_t ft3267_init(TwoWire &Wrie) {
-  if (NULL != _Wrie) {
-    return ESP_ERR_INVALID_STATE;
-  }
+esp_err_t ft3267_init(TwoWire &Wrie)
+{
 
-  // ft3267_handle = i2c_bus_device_create(dev_handle, ft3267_ADDR, 400000);
+    _Wrie = &Wrie;
 
-  _Wrie = &Wrie;
+    if (NULL == _Wrie) {
+        return ESP_FAIL;
+    }
 
-  if (NULL == _Wrie) {
-    return ESP_FAIL;
-  }
+    esp_err_t ret_val = ESP_OK;
 
-  esp_err_t ret_val = ESP_OK;
+    // Valid touching detect threshold
+    ft3267_write_byte(FT5x06_ID_G_THGROUP, 70);
 
-  // Valid touching detect threshold
-  ft3267_write_byte(FT5x06_ID_G_THGROUP, 70);
+    // valid touching peak detect threshold
+    ft3267_write_byte(FT5x06_ID_G_THPEAK, 60);
 
-  // valid touching peak detect threshold
-  ft3267_write_byte(FT5x06_ID_G_THPEAK, 60);
+    // Touch focus threshold
+    ft3267_write_byte(FT5x06_ID_G_THCAL, 16);
 
-  // Touch focus threshold
-  ft3267_write_byte(FT5x06_ID_G_THCAL, 16);
+    // threshold when there is surface water
+    ft3267_write_byte(FT5x06_ID_G_THWATER, 60);
 
-  // threshold when there is surface water
-  ft3267_write_byte(FT5x06_ID_G_THWATER, 60);
+    // threshold of temperature compensation
+    ft3267_write_byte(FT5x06_ID_G_THTEMP, 10);
 
-  // threshold of temperature compensation
-  ft3267_write_byte(FT5x06_ID_G_THTEMP, 10);
+    // Touch difference threshold
+    ft3267_write_byte(FT5x06_ID_G_THDIFF, 20);
 
-  // Touch difference threshold
-  ft3267_write_byte(FT5x06_ID_G_THDIFF, 20);
+    // Delay to enter 'Monitor' status (s)
+    ft3267_write_byte(FT5x06_ID_G_TIME_ENTER_MONITOR, 2);
 
-  // Delay to enter 'Monitor' status (s)
-  ft3267_write_byte(FT5x06_ID_G_TIME_ENTER_MONITOR, 2);
+    // Period of 'Active' status (ms)
+    ft3267_write_byte(FT5x06_ID_G_PERIODACTIVE, 12);
 
-  // Period of 'Active' status (ms)
-  ft3267_write_byte(FT5x06_ID_G_PERIODACTIVE, 12);
+    // Timer to enter 'idle' when in 'Monitor' (ms)
+    ft3267_write_byte(FT5x06_ID_G_PERIODMONITOR, 40);
 
-  // Timer to enter 'idle' when in 'Monitor' (ms)
-  ft3267_write_byte(FT5x06_ID_G_PERIODMONITOR, 40);
-
-  return ESP_OK;
+    return ESP_OK;
 }
 
-static esp_err_t ft3267_get_touch_points_num(uint8_t *touch_points_num) {
+static esp_err_t ft3267_get_touch_points_num(uint8_t *touch_points_num)
+{
 
-  return ft3267_read_byte(FT5x06_TOUCH_POINTS, touch_points_num);
+    return ft3267_read_byte(FT5x06_TOUCH_POINTS, touch_points_num);
 }
 
-esp_err_t ft3267_read_pos(uint8_t *touch_points_num, uint16_t *x, uint16_t *y) {
-  esp_err_t ret_val = ESP_OK;
-  static uint8_t data[4];
+esp_err_t ft3267_read_pos(uint8_t *touch_points_num, uint16_t *x, uint16_t *y)
+{
+    esp_err_t ret_val = ESP_OK;
+    static uint8_t data[4];
 
-  ret_val |= ft3267_get_touch_points_num(touch_points_num);
-  *touch_points_num = (*touch_points_num) & 0x0f;
-  if (0 == *touch_points_num) {
-  } else {
-    ret_val |= ft3267_read_bytes(FT5x06_TOUCH1_XH, 4, data);
+    ret_val |= ft3267_get_touch_points_num(touch_points_num);
+    *touch_points_num = (*touch_points_num) & 0x0f;
+    if (0 == *touch_points_num) {
+    } else {
+        ret_val |= ft3267_read_bytes(FT5x06_TOUCH1_XH, 4, data);
 
-    *x = ((data[0] & 0x0f) << 8) + data[1];
-    *y = ((data[2] & 0x0f) << 8) + data[3];
-  }
+        *x = ((data[0] & 0x0f) << 8) + data[1];
+        *y = ((data[2] & 0x0f) << 8) + data[3];
+    }
 
-  return ret_val;
+    return ret_val;
 }
 
-esp_err_t fx5x06_read_gesture(ft3267_gesture_t *gesture) {
-  return ft3267_read_byte(FT5x06_GESTURE_ID, (uint8_t *)gesture);
+esp_err_t fx5x06_read_gesture(ft3267_gesture_t *gesture)
+{
+    return ft3267_read_byte(FT5x06_GESTURE_ID, (uint8_t *)gesture);
 }

@@ -283,12 +283,12 @@ void setup()
     pinMode(TP_INT_PIN, INPUT);
 
     waitInterruptReady();
-
 #else
     xl.digitalWrite(TP_RES_PIN, LOW);
     delay(200);
     xl.digitalWrite(TP_RES_PIN, HIGH);
     delay(200);
+    pinMode(TP_INT_PIN, INPUT);
 #endif
 
     scan_iic();
@@ -668,10 +668,6 @@ void deep_sleep(void)
     }
     delay(2000);
     Serial.println("Touch release!!!");
-
-#else
-    xl.pinMode8(0, 0xff, INPUT);
-    xl.pinMode8(1, 0xff, INPUT);
 #endif
 
     // If the SD card is initialized, it needs to be unmounted.

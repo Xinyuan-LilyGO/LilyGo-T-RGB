@@ -144,9 +144,6 @@ XL9535 xl;
 OneButton button(0, true);
 
 const int backlightPin = EXAMPLE_PIN_NUM_BK_LIGHT;
-const int pwmChannel = 0;
-const int freq = 1000;
-const int resolution = 8;
 bool click = false;
 TaskHandle_t pvCreatedTask;
 
@@ -242,11 +239,45 @@ static void lv_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data
 void waitInterruptReady()
 {
 #if defined(USING_2_8_INC_GT911)
+    Serial.println("waitInterruptReady ...");
+
+    uint32_t timeout = millis() + 3000;
     //Wait for the GT911 interrupt signal to be ready
     while (!digitalRead(TP_INT_PIN)) {
+        if (timeout <  millis()) {
+            Serial.println("timeout !");
+            esp_restart();
+        }
         touch.read(); delay(10);
     }
 #endif
+}
+
+// LilyGo  T-RGB  control backlight chip has 16 levels of adjustment range
+// The adjustable range is 0~15, 0 is the minimum brightness, 15 is the maximum brightness
+void setBrightness(uint8_t value)
+{
+    static uint8_t level = 0;
+    static uint8_t steps = 16;
+    if (value == 0) {
+        digitalWrite(backlightPin, 0);
+        delay(3);
+        level = 0;
+        return;
+    }
+    if (level == 0) {
+        digitalWrite(backlightPin, 1);
+        level = steps;
+        delayMicroseconds(30);
+    }
+    int from = steps - level;
+    int to = steps - value;
+    int num = (steps + to - from) % steps;
+    for (int i = 0; i < num; i++) {
+        digitalWrite(backlightPin, 0);
+        digitalWrite(backlightPin, 1);
+    }
+    level = value;
 }
 
 void setup()
@@ -261,7 +292,6 @@ void setup()
     pinMode(BAT_VOLT_PIN, ANALOG);
 
     Wire.begin(IIC_SDA_PIN, IIC_SCL_PIN);
-
 
     xl.begin();
 
@@ -410,15 +440,14 @@ void setup()
 
     lv_task_handler();
 
-    //Use ledc adjust blacklight
-    ledcSetup(pwmChannel, freq, resolution);
-    ledcAttachPin(backlightPin, pwmChannel);
 
-    // Adjust backlight to maximum
-    for (int i = 0; i <= 255; i++) {
-        ledcWrite(pwmChannel, i);
-        delay(5);
+    pinMode(backlightPin, OUTPUT);
+    //LilyGo T-RGB control backlight chip has 16 levels of adjustment range
+    for (int i = 0; i < 16; ++i) {
+        setBrightness(i);
+        delay(30);
     }
+
 
     int i = 1;
     while (i <= 3) {
@@ -550,6 +579,7 @@ void SD_init(void)
     uint64_t cardSize = SD_MMC.cardSize() / (1024 * 1024);
     Serial.printf("SD Card Size: %lluMB\n", cardSize);
 }
+
 // This task is used to test WIFI, http test
 void wifi_task(void *param)
 {
@@ -692,9 +722,9 @@ void deep_sleep(void)
         SD_MMC.end();
 
     //turn off blacklight
-    for (int i = 255; i >= 0 ; i--) {
-        ledcWrite(pwmChannel, i);
-        delay(5);
+    for (int i = 16; i >= 0; --i) {
+        setBrightness(i);
+        delay(30);
     }
 
     Serial.println("Enter deep sleep");

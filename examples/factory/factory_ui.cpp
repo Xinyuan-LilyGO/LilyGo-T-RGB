@@ -10,6 +10,7 @@ void ui_begin()
     String buf;
     lv_obj_t *cout = lv_obj_create(lv_scr_act());
     lv_obj_set_size(cout, LV_PCT(100), LV_PCT(100));
+    lv_obj_set_scroll_dir(cout, LV_DIR_NONE);
 
     lv_obj_t *chip_info = lv_label_create(cout);
     lv_obj_set_width(chip_info, LV_PCT(50));
@@ -31,6 +32,10 @@ void ui_begin()
     buf += "\r\nCPU frequency: ";
     buf += ESP.getCpuFreqMHz();
     buf += "MHz";
+    buf += "\r\nUse ";
+    buf +=  getTouchAddr();
+    buf += " Touch Dev";
+
 
     if (SD_MMC.cardSize()) {
         buf += "\r\nSD Card Size: #00ff00 ";
@@ -72,11 +77,26 @@ void ui_begin()
     LV_EVENT_MSG_RECEIVED, NULL);
     lv_msg_subsribe_obj(MSG_TOUCH_UPDATE, tpoint_label, NULL);
 
-    lv_obj_t *btn = lv_btn_create(cout);
-    lv_obj_align_to(btn, tpoint_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 10);
-    lv_obj_set_height(btn, 50);
+    lv_obj_t *touch_status = lv_label_create(cout);
+    lv_obj_align_to(touch_status, tpoint_label, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+    lv_label_set_recolor(touch_status, true);
     lv_obj_add_event_cb(
-    btn, [](lv_event_t *e) {
+    touch_status,   [](lv_event_t *e) {
+        lv_obj_t *label = (lv_obj_t *)lv_event_get_target(e);
+        lv_msg_t *m = lv_event_get_msg(e);
+        bool *v = ( bool *)lv_msg_get_payload(m);
+        if (*v)
+            lv_label_set_text_fmt(label, "touch #00ff00 Pressed\r\n");
+        else
+            lv_label_set_text_fmt(label, "touch #0000ff Release#\r\n");
+    },
+    LV_EVENT_MSG_RECEIVED, NULL);
+    lv_msg_subsribe_obj(MSG_TOUCH_INT_UPDATE, touch_status, NULL);
+
+    lv_obj_t *btn = lv_btn_create(cout);
+    lv_obj_align_to(btn, touch_status, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 10);
+    lv_obj_set_height(btn, 50);
+    lv_obj_add_event_cb( btn, [](lv_event_t *e) {
         deep_sleep();
     }, LV_EVENT_CLICKED, NULL);
 
@@ -86,11 +106,10 @@ void ui_begin()
 
     lv_obj_t *wifi_label = lv_label_create(cout);
     lv_obj_set_width(wifi_label, LV_PCT(60));
+    lv_obj_set_height(wifi_label, LV_PCT(120));
     lv_obj_align_to(wifi_label, btn, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 10);
     lv_label_set_recolor(wifi_label, true);
-    lv_obj_add_event_cb(
-        wifi_label,
-    [](lv_event_t *e) {
+    lv_obj_add_event_cb( wifi_label,  [](lv_event_t *e) {
         lv_obj_t *label = (lv_obj_t *)lv_event_get_target(e);
         lv_msg_t *m = lv_event_get_msg(e);
         const char *v = (const char *)lv_msg_get_payload(m);

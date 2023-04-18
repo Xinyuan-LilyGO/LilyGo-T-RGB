@@ -157,6 +157,9 @@ esp_err_t ft3267_init(TwoWire &Wrie)
     // Timer to enter 'idle' when in 'Monitor' (ms)
     ft3267_write_byte(FT5x06_ID_G_PERIODMONITOR, 40);
 
+    //setting interrupt
+    ft3267_write_byte(FT5x06_ID_G_MODE, 0);
+
     return ESP_OK;
 }
 

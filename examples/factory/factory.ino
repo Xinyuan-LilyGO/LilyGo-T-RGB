@@ -154,8 +154,26 @@ void tft_init(void);
 void lcd_cmd(const uint8_t cmd);
 void lcd_data(const uint8_t *data, int len);
 void wifi_task(void *param);
+bool touchDevicesOnline = false;
+uint8_t touchAddress = 0;
 
-void scan_iic(void)
+const char *getTouchAddr()
+{
+    if (touchAddress == FT5x06_ADDR) {
+        return "FT3267";
+    } else if (touchAddress == CST820_ADDR) {
+        return "CST820";
+    } else if (touchAddress == GT911_ADDR) {
+        return "GT911";
+    }
+#ifdef USING_2_1_INC_CST820
+    return "CST820";
+#else
+    return "UNKONW";
+#endif
+}
+
+void scanDevices(void)
 {
     byte error, address;
     int nDevices = 0;
@@ -165,6 +183,13 @@ void scan_iic(void)
         error = Wire.endTransmission();
         if (error == 0) {
             Serial.printf("I2C device found at address 0x%02X\n", address);
+            if (address == FT5x06_ADDR) {
+                Serial.println("Find FT5X06 touch device!"); touchDevicesOnline = true; touchAddress = FT5x06_ADDR;
+            } else if (address == CST820_ADDR) {
+                Serial.println("Find CST820 touch device!"); touchDevicesOnline = true; touchAddress = CST820_ADDR;
+            } else if (address == GT911_ADDR) {
+                Serial.println("Find GT911 touch device!"); touchDevicesOnline = true; touchAddress = GT911_ADDR;
+            }
             nDevices++;
         } else if (error != 2) {
             Serial.printf("Error %d at address 0x%02X\n", error, address);
@@ -224,7 +249,6 @@ static void lv_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data
 
 #elif defined(USING_2_1_INC_CST820) || defined(USING_2_8_INC_GT911)
     if (touch.read()) {
-        // touch.read();
         TP_Point t = touch.getPoint(0);
         data->point.x = p.x = t.x;
         data->point.y = p.y = t.y;
@@ -238,19 +262,33 @@ static void lv_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data
 
 void waitInterruptReady()
 {
-#if defined(USING_2_8_INC_GT911)
     Serial.println("waitInterruptReady ...");
 
-    uint32_t timeout = millis() + 3000;
+    uint32_t timeout = millis() + 500;
+
+// The touch interrupt of CST820 is a high and low pulse, it is not fixed, there will be a low level every ~10 milliseconds interval
+#ifdef USING_2_1_INC_CST820
+    while (timeout > millis()) {
+        while (!digitalRead(TP_INT_PIN)) {
+            delay(20);
+            timeout = millis() + 500;
+        }
+    }
+#else
     //Wait for the GT911 interrupt signal to be ready
     while (!digitalRead(TP_INT_PIN)) {
+#if defined(USING_2_8_INC_GT911)
         if (timeout <  millis()) {
             Serial.println("timeout !");
             esp_restart();
         }
-        touch.read(); delay(10);
-    }
+        touch.read();
 #endif
+        delay(10);
+    }
+
+#endif
+
 }
 
 // LilyGo  T-RGB  control backlight chip has 16 levels of adjustment range
@@ -318,14 +356,16 @@ void setup()
 
     waitInterruptReady();
 #else
+    delay(100);
     xl.digitalWrite(TP_RES_PIN, LOW);
-    delay(200);
+    delay(300);
     xl.digitalWrite(TP_RES_PIN, HIGH);
-    delay(200);
+    delay(300);
     pinMode(TP_INT_PIN, INPUT);
 #endif
 
-    scan_iic();
+    // Scanning I2C cannot get the device address of CST820, it is a non-standard I2C device
+    scanDevices();
 
 #if defined(USING_2_1_INC_FT3267)
     ft3267_init(Wire);
@@ -465,11 +505,12 @@ void setup()
 
     lv_obj_del(img);
 
-
     ui_begin();
 
     xTaskCreate(wifi_task, "wifi_task", 1024 * 6, NULL, 1, &pvCreatedTask);
 }
+
+bool lastStatus = false;
 
 void loop()
 {
@@ -482,6 +523,17 @@ void loop()
         lv_msg_send(MSG_BAT_VOLT_UPDATE, &v);
         Millis = millis();
     }
+
+#ifndef USING_2_1_INC_CST820
+    bool touched = digitalRead(TP_INT_PIN) == LOW;
+    if (touched) {
+        lastStatus = touched;
+        lv_msg_send(MSG_TOUCH_INT_UPDATE, &touched);
+    } else if (!touched && lastStatus) {
+        lastStatus = false;
+        lv_msg_send(MSG_TOUCH_INT_UPDATE, &touched);
+    }
+#endif
 }
 
 void lcd_send_data(uint8_t data)
@@ -639,9 +691,19 @@ void wifi_task(void *param)
     lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
 
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    uint32_t timestamp = millis() + 30000;
     while (WiFi.status() != WL_CONNECTED) {
+        if (timestamp < millis()) {
+            Serial.println("WiFi Connect failed!");
+            lv_msg_send(MSG_WIFI_UPDATE, "WiFi Connect failed!");
+            pvCreatedTask = NULL;
+            vTaskDelete(NULL);
+            while (1) {
+                delay(30000);
+            }
+        }
         Serial.print(".");
-        vTaskDelay(100);
+        vTaskDelay(500);
         str += ".";
         lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
     }
@@ -689,33 +751,33 @@ void wifi_task(void *param)
     str = "#00ff00 WIFI detection function completed #";
     lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
 
+    pvCreatedTask = NULL;
     vTaskDelete(NULL);
 }
 
 void deep_sleep(void)
 {
-    vTaskDelete(pvCreatedTask);
+    if (pvCreatedTask) {
+        vTaskDelete(pvCreatedTask);
+    }
 
     WiFi.disconnect();
 
     Serial.println("DEEP SLEEP !!!!");
+
 
 #ifdef USING_2_8_INC_GT911
     // After setting touch to sleep, touch wakeup cannot be used, it needs to be changed to button wakeup, or timing wakeup
     // pinMode(TP_INT_PIN, OUTPUT);
     // digitalWrite(TP_INT_PIN, LOW); //Before touch to set sleep, it is necessary to set INT to LOW
     // touch.enableSleep();
+#endif
 
     pinMode(TP_INT_PIN, INPUT);
-    while (!digitalRead(TP_INT_PIN)) {
-        Serial.println("Wait touch release!");
-        // It is necessary to read the touch message, otherwise the interrupt level will remain at 0
-        touch.read();
-        delay(200);
-    }
+    waitInterruptReady();
+
     delay(2000);
     Serial.println("Touch release!!!");
-#endif
 
     // If the SD card is initialized, it needs to be unmounted.
     if (SD_MMC.cardSize())
@@ -728,6 +790,7 @@ void deep_sleep(void)
     }
 
     Serial.println("Enter deep sleep");
+    waitInterruptReady();
     delay(1000);
 
     // After setting touch to sleep, touch wakeup cannot be used, it needs to be changed to button wakeup, or timing wakeup

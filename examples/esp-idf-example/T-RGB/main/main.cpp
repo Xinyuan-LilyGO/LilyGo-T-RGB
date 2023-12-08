@@ -272,7 +272,7 @@ extern "C" void app_main(void)
     xl9535_digitalWrite(TP_RES_PIN, 0);
     vTaskDelay(200 / portTICK_PERIOD_MS);
     xl9535_digitalWrite(TP_RES_PIN, 1);
-
+    vTaskDelay(200 / portTICK_PERIOD_MS);
     touch.begin(TOUCH_SLAVE_ADDRESS, -1, readRegister, writeRegister);
 
     ESP_LOGI(TAG, "Initialize st7701s");

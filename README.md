@@ -2,7 +2,7 @@
 
 ## News
 
-1. Easy to use RGB panel library, organized by [fablabnbg/TRGBArduinoSupport](https://github.com/fablabnbg/TRGBArduinoSupport),This is more recommended for novices
+1. Easy to use RGB panel library, organized by [fablabnbg/TRGBArduinoSupport](https://github.com/fablabnbg/TRGBArduinoSupport),This is more recommended for novices (**Only Support 2.1 inch FT3267 touch chip version**)
 2. Currently, there are three types of RGB panels
     * 2.1 inch FT3267 touch chip version (Half circle 2.1 inches use FT3267 touch screen)
     * 2.1 inch CST820 touch chip version (Full circle 2.1 inches using CST820 touch screen)

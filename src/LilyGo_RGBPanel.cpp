@@ -36,7 +36,7 @@ LilyGo_RGBPanel::~LilyGo_RGBPanel()
     }
 }
 
-bool LilyGo_RGBPanel::begin(LilyGo_RGBPanel_Colos_Order  order)
+bool LilyGo_RGBPanel::begin(LilyGo_RGBPanel_Color_Order  order)
 {
     if (_panelDrv) {
         return true;
@@ -96,7 +96,7 @@ bool LilyGo_RGBPanel::installSD()
     return false;
 }
 
-void LilyGo_RGBPanel::unistallSD()
+void LilyGo_RGBPanel::uninstallSD()
 {
     SD_MMC.end();
     extension.digitalWrite(sdmmc_cs, LOW);
@@ -144,17 +144,17 @@ LilyGo_RGBPanel_Type LilyGo_RGBPanel::getModel()
 {
     if (_touchDrv) {
         const char *model = _touchDrv->getModelName();
-        if (model == NULL)return LILYGO_T_RGB_UNKOWN;
-        if (strlen(model) == 0)return LILYGO_T_RGB_UNKOWN;
+        if (model == NULL)return LILYGO_T_RGB_UNKNOWN;
+        if (strlen(model) == 0)return LILYGO_T_RGB_UNKNOWN;
         if (strcmp(model, "FT3267") == 0) {
-            return LILYGO_T_RGB_2_1_INCEHS;
+            return LILYGO_T_RGB_2_1_INCHES;
         } else if (strcmp(model, "CST820") == 0) {
-            return LILYGO_T_RGB_2_1_INCEHS;
+            return LILYGO_T_RGB_2_1_INCHES;
         } else if (strcmp(model, "GT911") == 0) {
-            return LILYGO_T_RGB_2_8_INCEHS;
+            return LILYGO_T_RGB_2_8_INCHES;
         }
     }
-    return LILYGO_T_RGB_UNKOWN;
+    return LILYGO_T_RGB_UNKNOWN;
 }
 
 void LilyGo_RGBPanel::sleep()

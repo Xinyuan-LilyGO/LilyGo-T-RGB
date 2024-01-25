@@ -30,13 +30,13 @@
 
 
 enum LilyGo_RGBPanel_Type {
-    LILYGO_T_RGB_UNKOWN,
-    LILYGO_T_RGB_2_1_INCEHS,
-    LILYGO_T_RGB_2_8_INCEHS,
+    LILYGO_T_RGB_UNKNOWN,
+    LILYGO_T_RGB_2_1_INCHES,
+    LILYGO_T_RGB_2_8_INCHES,
 };
 
 
-enum LilyGo_RGBPanel_Colos_Order {
+enum LilyGo_RGBPanel_Color_Order {
     LILYGO_T_RGB_ORDER_RGB,
     LILYGO_T_RGB_ORDER_BGR,
 };
@@ -50,11 +50,11 @@ public:
     
     ~LilyGo_RGBPanel();
 
-    bool begin(LilyGo_RGBPanel_Colos_Order  order = LILYGO_T_RGB_ORDER_RGB);
+    bool begin(LilyGo_RGBPanel_Color_Order  order = LILYGO_T_RGB_ORDER_RGB);
 
     bool installSD();
 
-    void unistallSD();
+    void uninstallSD();
 
     void setBrightness(uint8_t level);
 
@@ -95,7 +95,7 @@ private:
 
     TouchDrvInterface *_touchDrv;
 
-    LilyGo_RGBPanel_Colos_Order  _order;
+    LilyGo_RGBPanel_Color_Order  _order;
 
     bool _has_init;
 

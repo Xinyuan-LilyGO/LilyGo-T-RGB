@@ -4,6 +4,10 @@
 [![Build PlatformIO](https://github.com/Xinyuan-LilyGO/LilyGo-T-RGB/actions/workflows/pio.yml/badge.svg)](https://github.com/Xinyuan-LilyGO/LilyGo-T-RGB/actions/workflows/pio.yml)
 [![Arduino_CI](https://github.com/Xinyuan-LilyGO/LilyGo-T-RGB/actions/workflows/arduino_ci.yml/badge.svg)](https://github.com/Xinyuan-LilyGO/LilyGo-T-RGB/actions/workflows/arduino_ci.yml)
 
+# News🏳️‍🌈
+
+- How to integrate **LilyGo-T-RGB** in your own project, please refer to [issue](https://github.com/Xinyuan-LilyGO/LilyGo-T-RGB/issues/43)
+
 ## 1️⃣Support Product
 
 | Product(PinMap)                 | SOC        | Flash | PSRAM    | Resolution | Size     |

@@ -17,8 +17,10 @@ static void TouchDrvPinMode(uint32_t gpio, uint8_t mode);
 static ExtensionIOXL9555 extension;
 static const lcd_init_cmd_t *_init_cmd = NULL;
 
-LilyGo_RGBPanel::LilyGo_RGBPanel(/* args */) : _order(LILYGO_T_RGB_ORDER_RGB),
-    _panelDrv(NULL), _touchDrv(NULL), _brightness(0), _has_init(false)
+LilyGo_RGBPanel::LilyGo_RGBPanel(/* args */) :
+    _brightness(0), _panelDrv(NULL), _touchDrv(NULL),
+    _order(LILYGO_T_RGB_ORDER_RGB),
+    _has_init(false)
 {
 }
 
@@ -203,7 +205,7 @@ bool LilyGo_RGBPanel::isPressed()
 uint16_t LilyGo_RGBPanel::getBattVoltage()
 {
     esp_adc_cal_characteristics_t adc_chars;
-    esp_adc_cal_value_t val_type = esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &adc_chars);
+    esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &adc_chars);
 
     const int number_of_samples = 20;
     uint32_t sum = 0;
@@ -373,8 +375,10 @@ bool LilyGo_RGBPanel::initTouch()
 
         _init_cmd = st7701_2_1_inches;
 
+#if ARDUHAL_LOG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
         const char *model = _touchDrv->getModelName();
         log_i("Successfully initialized %s, using %s Driver!\n", model, model);
+#endif
         return true;
     }
     delete _touchDrv;
@@ -401,8 +405,11 @@ bool LilyGo_RGBPanel::initTouch()
 
         _init_cmd = st7701_2_1_inches;
 
+#if ARDUHAL_LOG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
         const char *model = _touchDrv->getModelName();
         log_i("Successfully initialized %s, using %s Driver!\n", model, model);
+#endif
+
         return true;
     }
     delete _touchDrv;
@@ -420,7 +427,7 @@ bool LilyGo_RGBPanel::initTouch()
 void LilyGo_RGBPanel::writeCommand(const uint8_t cmd)
 {
     uint16_t data = cmd;
-    extension.transfer9(cmd);
+    extension.transfer9(data);
 }
 
 void LilyGo_RGBPanel::writeData(const uint8_t *data, int len)

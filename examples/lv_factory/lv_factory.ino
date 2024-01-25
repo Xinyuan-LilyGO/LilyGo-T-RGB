@@ -39,12 +39,16 @@ LV_IMG_DECLARE(icon_ram);
 LV_IMG_DECLARE(icon_micro_sd);
 LV_IMG_DECLARE(image_1_480x480);
 LV_IMG_DECLARE(image_2_480x480);
-LV_IMG_DECLARE(image_3_480x480);
+
+
+//Arduino IDE cannot select the partition table as default_16MB.csv. Delete the image to reduce the size.
+// In platformio it is not affected
+// LV_IMG_DECLARE(image_3_480x480);     
 
 const void *images_bg[] = {
     &image_1_480x480,
     &image_2_480x480,
-    &image_3_480x480,
+    // &image_3_480x480,    
 };
 
 LilyGo_RGBPanel panel;

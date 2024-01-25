@@ -1,0 +1,38 @@
+#######################################
+# Syntax Coloring Map For LilyGO-T-RGB By lewis He
+# github:https://github.com/Xinyuan-LilyGO/LilyGO-T-RGB
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+LilyGo_RGBPanel	KEYWORD1
+
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+begin	KEYWORD2
+
+setBrightness	KEYWORD2
+getBrightness	KEYWORD2
+installSD	KEYWORD2
+unistallSD	KEYWORD2
+pushColors	KEYWORD2
+getModel	KEYWORD2
+width	KEYWORD2
+height	KEYWORD2
+getPoint	KEYWORD2
+getBoarsdConfigure	KEYWORD2
+isPressed	KEYWORD2
+getBattVoltage	KEYWORD2
+sleep	KEYWORD2
+wakeup	KEYWORD2
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+LILYGO_T_RGB_2_1_INCEHS	KEYWORD3
+LILYGO_T_RGB_2_8_INCEHS	KEYWORD3
+LILYGO_T_RGB_ORDER_RGB	KEYWORD3
+LILYGO_T_RGB_ORDER_BGR	KEYWORD3

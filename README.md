@@ -1,66 +1,113 @@
-<h1 align = "center"> 🌟T-RGB🌟</h1>
+<h1 align = "center">🌟LilyGO T-RGB🌟</h1>
 
-## News
+## 1️⃣Support Product
 
-1. Easy to use RGB panel library, organized by [fablabnbg/TRGBArduinoSupport](https://github.com/fablabnbg/TRGBArduinoSupport),This is more recommended for novices (**Only Support 2.1 inch FT3267 touch chip version**)
-2. Currently, there are three types of RGB panels
-    * 2.1 inch FT3267 touch chip version (Half circle 2.1 inches use FT3267 touch screen)
-    * 2.1 inch CST820 touch chip version (Full circle 2.1 inches using CST820 touch screen)
-    * 2.8 inch GT911 touch chip version (Full circle 2.8 inches using GT911 touch screen)
+| Product(PinMap)                 | SOC        | Flash | PSRAM    | Resolution | Size     |
+| ------------------------------- | ---------- | ----- | -------- | ---------- | -------- |
+| [T-RGB 2.1 inch Half Circle][1] | ESP32-S3R8 | 16MB  | 8MB(OPI) | 480x480    | 2.1 Inch |
+| [T-RGB 2.8 inch Full Circle][2] | ESP32-S3R8 | 16MB  | 8MB(OPI) | 480x480    | 2.1 Inch |
+| [T-RGB 2.8 inch Full Circle][3] | ESP32-S3R8 | 16MB  | 8MB(OPI) | 480x480    | 2.8 Inch |
 
-## Description
+| Product(PinMap)                 | Display Driver | Touch Driver |
+| ------------------------------- | -------------- | ------------ |
+| [T-RGB 2.1 inch Half Circle][1] | ST7701S        | FT3267       |
+| [T-RGB 2.8 inch Full Circle][2] | ST7701S        | CST820       |
+| [T-RGB 2.8 inch Full Circle][3] | ST7701S        | GT911        |
 
-`T-RGB` is a development board whose main control chip is ESP32-S3. It is equipped with a `2.1-inch LCD` color screen (3SPI&RGB interface) and  touch chip. It has TF card reading and writing function and is equipped with a programmable button and a set of IIC pins. It can be powered with a lithium battery and charged with a USB. You can use the ESP32S3 directly for USB communication or programming.
+[1]: https://www.lilygo.cc/products/t-rgb?variant=42407295877301
+[2]: https://www.lilygo.cc/products/t-rgb
+[3]: https://www.lilygo.cc/products/t-rgb?variant=42880799441077
 
-![specifications_en](assets/image/specifications_en.jpg)
+## 2️⃣Examples
 
-## Pinmap
+```txt
+examples/
+├── AdjustBacklight             # Backlight adjustment example
+├── Arduino_GFX_HelloWorld      # Arduino_GFX example
+├── Arduino_GFX_SpriteGif       # Arduino_GFX example
+├── BatteryVoltage*             # Battery voltage reading example
+├── RGBPanel                    # lvgl test example
+├── TFT_eSPI_Sprite             # TFT_eSPI Sprite Example
+├── Touchpad                    # Capacitive touch example
+├── lv_benchmark                # lvgl benchmark  example
+├── lv_factory                  # factory example
+├── lv_gif                      # lvgl gif decoding example
+├── lv_images                   # lvgl Picture decoding example
+├── lv_music                    # lvgl music  example
+└── lv_qrcode                   # lvgl qrcode  example
+```
 
-![pinmap_en](assets/image/pinmap_en.jpg)
+* **BatteryVoltage** When USB is plugged in, the battery voltage cannot be read because the battery voltage is equal to the charging voltage at this time
 
-## Product 📷
-
-| Product |                            Product Link                            |
-| :-----: | :----------------------------------------------------------------: |
-|  T-RGB  | [AliExpress](https://www.aliexpress.us/item/1005004778542414.html) |
-
-## Quick Start
-
-### PlatformIO Quick Start (Recommended)
+## 3️⃣ PlatformIO Quick Start (Recommended)
 
 1. Install [Visual Studio Code](https://code.visualstudio.com/) and [Python](https://www.python.org/)
 2. Search for the `PlatformIO` plugin in the `VisualStudioCode` extension and install it.
 3. After the installation is complete, you need to restart `VisualStudioCode`
-4. After restarting `VisualStudioCode`, select `File` in the upper left corner of `VisualStudioCode` -> `Open Folder` -> select the `T-RGB` directory
+4. After restarting `VisualStudioCode`, select `File` in the upper left corner of `VisualStudioCode` -> `Open Folder` -> select the `LilyGo T-RGB` directory
 5. Wait for the installation of third-party dependent libraries to complete
 6. Click on the `platformio.ini` file, and in the `platformio` column
-7. Uncomment one of the lines `default_envs = xxxx` to make sure only one line works
+7. Uncomment one of the lines `src_dir = xxxx` to make sure only one line works
 8. Click the (✔) symbol in the lower left corner to compile
 9. Connect the board to the computer USB
 10. Click (→) to upload firmware
 11. Click (plug symbol) to monitor serial output
 12. If it cannot be written, or the USB device keeps flashing, please check the **FAQ** below
 
-### Arduino IDE Quick Start
+## 4️⃣ Install from Arduino Library Manager (recommended)
 
-* It is recommended to use platformio without cumbersome steps
+1. Install [Arduino IDE](https://www.arduino.cc/en/software)
+2. Install [Arduino ESP32 V 2.0.5 or above and below V3.0](https://docs.espressif.com/projects/arduino-esp32/en/latest/) 
+3. `Sketch` -> `Inclued Library` -> `Manage Libraries`
+4. `Library Search` -> `LilyGo T-RGB` -> `Install` -> `Install ALL`
+5. `File` -> `Examples` -> `LilyGo T-RGB` -> `Any Examples`
+6. `Tools` , Make your selection according to the table below
+    | Arduino IDE Setting                  | Value                             |
+    | ------------------------------------ | --------------------------------- |
+    | Board                                | **ESP32S3 Dev Module**            |
+    | Port                                 | Your port                         |
+    | USB CDC On Boot                      | Enable                            |
+    | CPU Frequency                        | 240MHZ(WiFi)                      |
+    | Core Debug Level                     | None                              |
+    | USB DFU On Boot                      | Disable                           |
+    | Erase All Flash Before Sketch Upload | Disbale                           |
+    | Events Run On                        | Core1                             |
+    | Flash Mode                           | QIO 80MHZ                         |
+    | Flash Size                           | **16MB(128Mb)**                   |
+    | Arduino Runs On                      | Core1                             |
+    | USB Firmware MSC On Boot             | Disbale                           |
+    | Partition Scheme                     | **16M Flash(3M APP/9.9MB FATFS)** |
+    | PSRAM                                | **OPI PSRAM**                     |
+    | Upload Mode                          | **UART0/Hardware CDC**            |
+    | Upload Speed                         | 921600                            |
+    | USB Mode                             | **CDC and JTAG**                  |
+    * The options in bold are required, others are selected according to actual conditions.
+
+7. Select `Port` ， select you board port
+8. Click `upload` , Wait for compilation and writing to complete
+9. If it cannot be written, or the USB device keeps flashing, please check the **FAQ** below
+
+## 5️⃣ Arduino IDE Manual installation (not recommended)
 
 1. Install [Arduino IDE](https://www.arduino.cc/en/software)
 2. Install [Arduino ESP32 V 2.0.5 or above and below V3.0](https://docs.espressif.com/projects/arduino-esp32/en/latest/)
-3. Download `T-RGB` to Decktop
-4. Copy all folders in [lib folder](./lib/)  to Arduino library folder (e.g. C:\Users\YourName\Documents\Arduino\libraries)
-5. Open ArduinoIDE  ,`Tools` , Look at the picture to choose
-  ![setting](images/ArduinoIDE.jpg)
-1. Open `T-RGB` -> `examples` -> `any examples` -> `any eaxmples.ino`
-2. Select `Port`
-3. Click `upload` , Wait for compilation and writing to complete
-4. If it cannot be written, or the USB device keeps flashing, please check the **FAQ** below
+3. Download `LilyGo T-RGB` , move to Arduino library folder (e.g. C:\Users\YourName\Documents\Arduino\libraries)
+4. Copy all folders in [libdeps folder](./libdeps/)  to Arduino library folder (e.g. C:\Users\YourName\Documents\Arduino\libraries)
+5. Open ArduinoIDE  ,`Tools` , Make your selection based on the table above
+6. `File` -> `Examples` -> `LilyGo T-RGB` -> `Any Examples`
+7. Select `Port`， select you board port
+8. Click `upload` , Wait for compilation and writing to complete
+9. If it cannot be written, or the USB device keeps flashing, please check the **FAQ** below
 
+# 6️⃣ ESP32 basic examples
 
-### ESP-IDF:
-- The installation method is also inconsistent depending on the system, it is recommended to refer to the [official manual](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html) for installation
+* [BLE Examples](https://github.com/espressif/arduino-esp32/tree/master/libraries/BLE)
+* [WiFi Examples](https://github.com/espressif/arduino-esp32/tree/master/libraries/WiFi)
+* [SPIFFS Examples](https://github.com/espressif/arduino-esp32/tree/master/libraries/SPIFFS)
+* [FFat Examples](https://github.com/espressif/arduino-esp32/tree/master/libraries/FFat)
+* For more examples of esp32 chip functions, please refer to [arduino-esp32-libraries](https://github.com/espressif/arduino-esp32/tree/master/libraries)
 
-## FAQ
+# 7️⃣ FAQ
 
 1. The board uses USB as the JTAG upload port. When printing serial port information on USB_CDC_ON_BOOT configuration needs to be turned on.
 If the port cannot be found when uploading the program or the USB has been used for other functions, the port does not appear.
@@ -70,3 +117,50 @@ Please enter the upload mode manually.
    3. Release the RST
    4. Release the BOOT button
    5. Upload sketch
+
+2. If the above is invalid, burn the [binary file](./firmware/README.MD)  to check whether the hardware is normal
+3. If you use external power supply instead of USBC, please turn off the CDC option. This is because the board will wait for USB access when it starts.
+   * For Arduino IDE users, it can be turned off in the options , Please note that turning off USB CDC will turn off Serial redirection to USBC. At this time, you will not see any Serial message output when opening the port from USBC, but output from GPIO43 and GPIO44.
+
+    ```c
+    Tools -> USB CDC On Boot -> Disable
+    ```
+
+   * For Platformio users, you can add the following compilation flags in the ini file
+
+    ```c
+    build_flags =
+        ; Enable UARDUINO_USB_CDC_ON_BOOT will start printing and wait for terminal access during startup
+        ; -DARDUINO_USB_CDC_ON_BOOT=1
+
+        ; Enable UARDUINO_USB_CDC_ON_BOOT will turn off printing and will not block when using the battery
+        -UARDUINO_USB_CDC_ON_BOOT
+    ```
+4. When USB is plugged in, the battery voltage cannot be read because the battery voltage is equal to the charging voltage at this time
+5. Regarding the esp-idf version example, the latest version is not ready, the previous test version can be found [here](https://github.com/Xinyuan-LilyGO/T-RGB/releases/tag/v0.0.1)
+6. The Grove port has been set to I2C, sharing the bus with the touch and cannot be used for other purposes.
+7. T-RGB has no free GPIO and cannot be expanded
+8. T-RGB hardware connects to RGB666 screens, but ESP32 currently only supports RGB565
+9. `Serial.println` has no output. Please refer to the third step of the FAQ to set `USB CDC On Boot` to **Enable**.
+
+
+
+# 8️⃣ Resource
+
+* [schematic](./schematic/T-RGB.pdf)
+* [Dimensions](./dimensions/T-RGB-PCB.DXF)
+* [PCB 3D](./dimensions/T-RGB-FULL-3D.stp)
+
+## T-RGB datasheet
+
+* [ST7701S Driver datasheet](./datasheet/ST7701S_SPEC_%20V1.1.pdf)
+* [FT3267](./datasheet/FT3267-DataSheet.pdf)
+* [GT911](./datasheet/GT911%20Datasheet.pdf.pdf)
+* [ESP32S3-R8](https://www.espressif.com.cn/en/support/documents/technical-documents?keys=&field_type_tid%5B%5D=842)
+
+# 8️⃣ Depends on required libraries
+
+* [SensorLib](https://github.com/lewisxhe/SensorsLib)
+* [lvgl 8.3.11](https://github.com/lvgl/lvgl)
+
+* When using Arduino_GFX also depends on [Arduino_GFX](https://github.com/moononournation/Arduino_GFX)

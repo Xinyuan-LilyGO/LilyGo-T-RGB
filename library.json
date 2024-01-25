@@ -1,0 +1,59 @@
+{
+  "name": "LilyGo-T-RGB",
+  "version": "1.0.0",
+  "description": "LilyGo T-RGB Arduino library",
+  "keywords": "lilygo,rgb",
+  "authors": [
+    {
+      "name": "Xinyuan-LilyGO",
+      "url": "https://github.com/Xinyuan-LilyGO"
+    },
+    {
+      "name": "LewisHe",
+      "url": "https://github.com/lewisxhe",
+      "maintainer": true
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Xinyuan-LilyGO/LilyGo-T-RGB.git"
+  },
+  "homepage": "https://github.com/Xinyuan-LilyGO/LilyGo-T-RGB",
+  "export": {
+    "include": [
+      "LICENSE",
+      "library.json",
+      "library.properties",
+      "README.md",
+      "keywords.txt",
+      "src/*",
+      "examples/*"
+    ]
+  },
+  "dependencies": [
+    {
+      "owner": "lvgl",
+      "name": "lvgl",
+      "version": "^8.3.9"
+    },
+    {
+      "owner": "lewisxhe",
+      "name": "SensorLib",
+      "version": "^0.1.5"
+    },
+    {
+      "owner": "bodmer",
+      "name": "TFT_eSPI",
+      "version": "^2.5.43"
+    },
+    {
+      "owner": "moononournation",
+      "name": "GFX Library for Arduino",
+      "version": "^1.4.2"
+    }
+  ],
+  "examples": ["examples/*/*.ino"],
+  "frameworks": ["arduino"],
+  "platforms": "esp32",
+  "headers": "LilyGo_RGBPanel.h"
+}

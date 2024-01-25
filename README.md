@@ -87,17 +87,24 @@ examples/
 8. Click `upload` , Wait for compilation and writing to complete
 9. If it cannot be written, or the USB device keeps flashing, please check the **FAQ** below
 
-## 5️⃣ Arduino IDE Manual installation (not recommended)
+    **Note that T-RGB depends on lvgl v8.3.11 version. Currently lvgl has released lvgl v9.0 version. When compilation error occurs, please check whether lvgl belongs to v8.3.11**
+
+## 5️⃣ Arduino IDE Manual installation
 
 1. Install [Arduino IDE](https://www.arduino.cc/en/software)
 2. Install [Arduino ESP32 V 2.0.5 or above and below V3.0](https://docs.espressif.com/projects/arduino-esp32/en/latest/)
-3. Download `LilyGo T-RGB` , move to Arduino library folder (e.g. C:\Users\YourName\Documents\Arduino\libraries)
-4. Copy all folders in [libdeps folder](./libdeps/)  to Arduino library folder (e.g. C:\Users\YourName\Documents\Arduino\libraries)
-5. Open ArduinoIDE  ,`Tools` , Make your selection based on the table above
-6. `File` -> `Examples` -> `LilyGo T-RGB` -> `Any Examples`
-7. Select `Port`， select you board port
-8. Click `upload` , Wait for compilation and writing to complete
-9. If it cannot be written, or the USB device keeps flashing, please check the **FAQ** below
+3. Download `LilyGo T-RGB`
+4. Open ArduinoIDE  ,`Sketch` -> `Include Library` -> `Add .ZIP Library` -> Select `LilyGo T-RGB`
+5. Install dependent libraries
+   * `Sketch` -> `Inclued Library` -> `Manage Libraries` -> Search for `SensorLib`, install version greater than `v0.1.6`
+   * `Sketch` -> `Inclued Library` -> `Manage Libraries` -> Search for `lvgl`, install version `v8.3.11`
+   * `Sketch` -> `Inclued Library` -> `Manage Libraries` -> Search for `GFX Library for Arduino`, install version `v1.4.2`
+   * `Sketch` -> `Inclued Library` -> `Manage Libraries` -> Search for `TFT_eSPI`, install version `v2.5.22`
+6. Open ArduinoIDE  ,`Tools` , Make your selection based on the table above
+7. `File` -> `Examples` -> `LilyGo T-RGB` -> `Any Examples`
+8. Select `Port`， select you board port
+9. Click `upload` , Wait for compilation and writing to complete
+10. If it cannot be written, or the USB device keeps flashing, please check the **FAQ** below
 
 # 6️⃣ ESP32 basic examples
 

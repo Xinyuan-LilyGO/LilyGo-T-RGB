@@ -13,13 +13,13 @@
 | Product(PinMap)                 | SOC        | Flash | PSRAM    | Resolution | Size     |
 | ------------------------------- | ---------- | ----- | -------- | ---------- | -------- |
 | [T-RGB 2.1 inch Half Circle][1] | ESP32-S3R8 | 16MB  | 8MB(OPI) | 480x480    | 2.1 Inch |
-| [T-RGB 2.8 inch Full Circle][2] | ESP32-S3R8 | 16MB  | 8MB(OPI) | 480x480    | 2.1 Inch |
+| [T-RGB 2.1 inch Full Circle][2] | ESP32-S3R8 | 16MB  | 8MB(OPI) | 480x480    | 2.1 Inch |
 | [T-RGB 2.8 inch Full Circle][3] | ESP32-S3R8 | 16MB  | 8MB(OPI) | 480x480    | 2.8 Inch |
 
 | Product(PinMap)                 | Display Driver | Touch Driver |
 | ------------------------------- | -------------- | ------------ |
 | [T-RGB 2.1 inch Half Circle][1] | ST7701S        | FT3267       |
-| [T-RGB 2.8 inch Full Circle][2] | ST7701S        | CST820       |
+| [T-RGB 2.1 inch Full Circle][2] | ST7701S        | CST820       |
 | [T-RGB 2.8 inch Full Circle][3] | ST7701S        | GT911        |
 
 [1]: https://www.lilygo.cc/products/t-rgb?variant=42407295877301

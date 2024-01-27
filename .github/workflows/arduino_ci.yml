@@ -22,6 +22,7 @@ jobs:
             examples/BatteryVoltage/BatteryVoltage.ino,
             examples/lv_benchmark/lv_benchmark.ino,
             examples/lv_factory/lv_factory.ino,
+            examples/lv_helloworld/lv_helloworld.ino,
             examples/lv_gif/lv_gif.ino,
             examples/lv_images/lv_images.ino,
             examples/lv_music/lv_music.ino,

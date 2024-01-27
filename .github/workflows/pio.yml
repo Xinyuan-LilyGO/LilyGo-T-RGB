@@ -21,6 +21,7 @@ jobs:
             examples/BatteryVoltage,
             examples/lv_benchmark,
             examples/lv_factory,
+            examples/lv_helloworld,
             examples/lv_gif,
             examples/lv_images,
             examples/lv_music,

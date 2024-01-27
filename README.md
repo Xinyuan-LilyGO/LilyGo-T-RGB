@@ -37,6 +37,7 @@ examples/
 ├── RGBPanel                    # lvgl test example
 ├── TFT_eSPI_Sprite             # TFT_eSPI Sprite Example
 ├── Touchpad                    # Capacitive touch example
+├── lv_helloworld               # lvgl get started
 ├── lv_benchmark                # lvgl benchmark  example
 ├── lv_factory                  # factory example
 ├── lv_gif                      # lvgl gif decoding example

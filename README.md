@@ -8,6 +8,7 @@
 
 - How to integrate **LilyGo-T-RGB** in your own project, please refer to [issue](https://github.com/Xinyuan-LilyGO/LilyGo-T-RGB/issues/43)
 - `LilyGo-T-RGB` esp-idf version example, please jump to this [LilyGo-Display-IDF](https://github.com/Xinyuan-LilyGO/LilyGo-Display-IDF)
+*  `LilyGo-T-RGB` depends on lvgl **v8.3.x** version. Currently lvgl has released lvgl **v9.0** version. When compilation error occurs, please check whether lvgl belongs to **v8.3.x** 
 
 ## 1️⃣Support Product
 
@@ -70,8 +71,9 @@ examples/
 2. Install [Arduino ESP32 V 2.0.5 or above and below V3.0](https://docs.espressif.com/projects/arduino-esp32/en/latest/) 
 3. `Sketch` -> `Inclued Library` -> `Manage Libraries`
 4. `Library Search` -> `LilyGo T-RGB` -> `Install` -> `Install ALL`
-5. `File` -> `Examples` -> `LilyGo T-RGB` -> `Any Examples`
-6. `Tools` , Make your selection according to the table below
+5. `Library Search` -> `lvgl` -> `v8.3.11` -> `Install`
+6. `File` -> `Examples` -> `LilyGo T-RGB` -> `Any Examples`
+7. `Tools` , Make your selection according to the table below
     | Arduino IDE Setting                  | Value                             |
     | ------------------------------------ | --------------------------------- |
     | Board                                | **ESP32S3 Dev Module**            |
@@ -93,9 +95,9 @@ examples/
     | USB Mode                             | **CDC and JTAG**                  |
     * The options in bold are required, others are selected according to actual conditions.
 
-7. Select `Port` ， select you board port
-8. Click `upload` , Wait for compilation and writing to complete
-9. If it cannot be written, or the USB device keeps flashing, please check the **FAQ** below
+8. Select `Port` ， select you board port
+9. Click `upload` , Wait for compilation and writing to complete
+10. If it cannot be written, or the USB device keeps flashing, please check the **FAQ** below
 
     **Note that T-RGB depends on lvgl v8.3.11 version. Currently lvgl has released lvgl v9.0 version. When compilation error occurs, please check whether lvgl belongs to v8.3.11**
 

@@ -7,6 +7,7 @@
 # News🏳️‍🌈
 
 - How to integrate **LilyGo-T-RGB** in your own project, please refer to [issue](https://github.com/Xinyuan-LilyGO/LilyGo-T-RGB/issues/43)
+- `LilyGo-T-RGB` esp-idf version example, please jump to this [LilyGo-Display-IDF](https://github.com/Xinyuan-LilyGO/LilyGo-Display-IDF)
 
 ## 1️⃣Support Product
 

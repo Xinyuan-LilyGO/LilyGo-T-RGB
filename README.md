@@ -150,10 +150,10 @@ Please enter the upload mode manually.
 
     ```c
     build_flags =
-        ; Enable UARDUINO_USB_CDC_ON_BOOT will start printing and wait for terminal access during startup
+        ; Enable -DARDUINO_USB_CDC_ON_BOOT will start printing and wait for terminal access during startup
         ; -DARDUINO_USB_CDC_ON_BOOT=1
 
-        ; Enable UARDUINO_USB_CDC_ON_BOOT will turn off printing and will not block when using the battery
+        ; Enable -UARDUINO_USB_CDC_ON_BOOT will turn off printing and will not block when using the battery
         -UARDUINO_USB_CDC_ON_BOOT
     ```
 4. When USB is plugged in, the battery voltage cannot be read because the battery voltage is equal to the charging voltage at this time

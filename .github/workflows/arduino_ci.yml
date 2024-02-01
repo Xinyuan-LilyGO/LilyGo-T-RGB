@@ -15,22 +15,21 @@ jobs:
     strategy:
       matrix:
         examples:
-          [
-            examples/AdjustBacklight/AdjustBacklight.ino,
-            examples/Arduino_GFX_HelloWorld/Arduino_GFX_HelloWorld.ino,
-            examples/Arduino_GFX_SpriteGif/Arduino_GFX_SpriteGif.ino,
-            examples/BatteryVoltage/BatteryVoltage.ino,
-            examples/lv_benchmark/lv_benchmark.ino,
-            examples/lv_factory/lv_factory.ino,
-            examples/lv_helloworld/lv_helloworld.ino,
-            examples/lv_gif/lv_gif.ino,
-            examples/lv_images/lv_images.ino,
-            examples/lv_music/lv_music.ino,
-            examples/lv_qrcode/lv_qrcode.ino,
-            examples/RGBPanel/RGBPanel.ino,
-            examples/TFT_eSPI_Sprite/TFT_eSPI_Sprite.ino,
-            examples/Touchpad/Touchpad.ino,
-          ]
+          - examples/AdjustBacklight/AdjustBacklight.ino
+          - examples/Arduino_GFX_HelloWorld/Arduino_GFX_HelloWorld.ino
+          - examples/Arduino_GFX_SpriteGif/Arduino_GFX_SpriteGif.ino
+          - examples/BatteryVoltage/BatteryVoltage.ino
+          - examples/lv_benchmark/lv_benchmark.ino
+          - examples/lv_factory/lv_factory.ino
+          - examples/lv_helloworld/lv_helloworld.ino
+          - examples/lv_gif/lv_gif.ino
+          - examples/lv_slider/lv_slider.ino
+          - examples/lv_images/lv_images.ino
+          - examples/lv_music/lv_music.ino
+          - examples/lv_qrcode/lv_qrcode.ino
+          - examples/RGBPanel/RGBPanel.ino
+          - examples/TFT_eSPI_Sprite/TFT_eSPI_Sprite.ino
+          - examples/Touchpad/Touchpad.ino
 
     env:
       EXAMPLES: ${{matrix.examples}}
@@ -55,6 +54,6 @@ jobs:
           git clone -b v0.1.5 https://github.com/lewisxhe/SensorLib.git
           git clone -b v2.5.33 https://github.com/Bodmer/TFT_eSPI.git
           git clone -b v1.4.2 https://github.com/moononournation/Arduino_GFX.git
-          
+
           cd $GITHUB_WORKSPACE ;
           arduino-cli compile -besp32:esp32:esp32s3:CDCOnBoot=cdc,FlashSize=16M,PartitionScheme=app3M_fat9M_16MB,PSRAM=opi --library . $PWD/$EXAMPLES ;

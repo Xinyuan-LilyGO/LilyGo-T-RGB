@@ -45,6 +45,7 @@ examples/
 ├── lv_gif                      # lvgl gif decoding example
 ├── lv_images                   # lvgl Picture decoding example
 ├── lv_music                    # lvgl music  example
+├── lv_slider                   # lvgl slider  example
 └── lv_qrcode                   # lvgl qrcode  example
 ```
 

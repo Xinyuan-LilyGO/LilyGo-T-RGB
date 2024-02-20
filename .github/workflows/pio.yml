@@ -16,20 +16,19 @@ jobs:
     strategy:
       matrix:
         example:
-          [
-            examples/AdjustBacklight,
-            examples/BatteryVoltage,
-            examples/lv_benchmark,
-            examples/lv_factory,
-            examples/lv_helloworld,
-            examples/lv_gif,
-            examples/lv_images,
-            examples/lv_music,
-            examples/lv_qrcode,
-            examples/RGBPanel,
-            examples/TFT_eSPI_Sprite,
-            examples/Touchpad,
-          ]
+          - examples/AdjustBacklight
+          - examples/BatteryVoltage
+          - examples/lv_benchmark
+          - examples/lv_factory
+          - examples/lv_helloworld
+          - examples/lv_gif
+          - examples/lv_images
+          - examples/lv_music
+          - examples/lv_qrcode
+          - examples/lv_slider
+          - examples/RGBPanel
+          - examples/TFT_eSPI_Sprite
+          - examples/Touchpad
 
     steps:
       - uses: actions/checkout@v3
@@ -44,7 +43,6 @@ jobs:
           python-version: "3.9"
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
-
 
       - name: Run PlatformIO
         run: pio run

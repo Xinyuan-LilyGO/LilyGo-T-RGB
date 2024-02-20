@@ -24,9 +24,7 @@ static lv_color_t *buf1 = NULL;
 /* Display flushing */
 static void disp_flush( lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p )
 {
-    uint32_t w = ( area->x2 - area->x1 + 1 );
-    uint32_t h = ( area->y2 - area->y1 + 1 );
-    static_cast<LilyGo_Display *>(disp_drv->user_data)->pushColors(area->x1, area->y1, w, h, (uint16_t *)color_p);
+    static_cast<LilyGo_Display *>(disp_drv->user_data)->pushColors(area->x1, area->y1, area->x2 + 1, area->y2 + 1, (uint16_t *)color_p);
     lv_disp_flush_ready( disp_drv );
 }
 
@@ -92,7 +90,7 @@ void beginLvglHelper(LilyGo_Display &board, bool debug)
     disp_drv.ver_res = board.height();
     disp_drv.flush_cb = disp_flush;
     disp_drv.draw_buf = &draw_buf;
-    disp_drv.full_refresh = 1;
+    // disp_drv.full_refresh = 1;
     disp_drv.user_data = &board;
     lv_disp_drv_register( &disp_drv );
 

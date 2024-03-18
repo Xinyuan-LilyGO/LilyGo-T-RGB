@@ -39,6 +39,7 @@ examples/
 ├── RGBPanel                    # lvgl test example
 ├── TFT_eSPI_Sprite             # TFT_eSPI Sprite Example
 ├── Touchpad                    # Capacitive touch example
+├── DeepSleep                   # Deep Sleep (Touch,Button,Timer)example
 ├── lv_helloworld               # lvgl get started
 ├── lv_benchmark                # lvgl benchmark  example
 ├── lv_factory                  # factory example
@@ -70,7 +71,7 @@ examples/
 
 1. Install [Arduino IDE](https://www.arduino.cc/en/software)
 2. Install [Arduino ESP32 V 2.0.5 or above and below V3.0](https://docs.espressif.com/projects/arduino-esp32/en/latest/) 
-3. `Sketch` -> `Inclued Library` -> `Manage Libraries`
+3. `Sketch` -> `Include Library` -> `Manage Libraries`
 4. `Library Search` -> `LilyGo T-RGB` -> `Install` -> `Install ALL`
 5. `Library Search` -> `lvgl` -> `v8.3.11` -> `Install`
 6. `File` -> `Examples` -> `LilyGo T-RGB` -> `Any Examples`
@@ -83,12 +84,12 @@ examples/
     | CPU Frequency                        | 240MHZ(WiFi)                      |
     | Core Debug Level                     | None                              |
     | USB DFU On Boot                      | Disable                           |
-    | Erase All Flash Before Sketch Upload | Disbale                           |
+    | Erase All Flash Before Sketch Upload | Disable                           |
     | Events Run On                        | Core1                             |
     | Flash Mode                           | QIO 80MHZ                         |
     | Flash Size                           | **16MB(128Mb)**                   |
     | Arduino Runs On                      | Core1                             |
-    | USB Firmware MSC On Boot             | Disbale                           |
+    | USB Firmware MSC On Boot             | Disable                           |
     | Partition Scheme                     | **16M Flash(3M APP/9.9MB FATFS)** |
     | PSRAM                                | **OPI PSRAM**                     |
     | Upload Mode                          | **UART0/Hardware CDC**            |
@@ -109,10 +110,10 @@ examples/
 3. Download `LilyGo T-RGB`
 4. Open ArduinoIDE  ,`Sketch` -> `Include Library` -> `Add .ZIP Library` -> Select `LilyGo T-RGB`
 5. Install dependent libraries
-   * `Sketch` -> `Inclued Library` -> `Manage Libraries` -> Search for `SensorLib`, install version greater than `v0.1.6`
-   * `Sketch` -> `Inclued Library` -> `Manage Libraries` -> Search for `lvgl`, install version `v8.3.11`
-   * `Sketch` -> `Inclued Library` -> `Manage Libraries` -> Search for `GFX Library for Arduino`, install version `v1.4.2`
-   * `Sketch` -> `Inclued Library` -> `Manage Libraries` -> Search for `TFT_eSPI`, install version `v2.5.22`
+   * `Sketch` -> `Include Library` -> `Manage Libraries` -> Search for `SensorLib`, install version greater than `v0.1.6`
+   * `Sketch` -> `Include Library` -> `Manage Libraries` -> Search for `lvgl`, install version `v8.3.11`
+   * `Sketch` -> `Include Library` -> `Manage Libraries` -> Search for `GFX Library for Arduino`, install version `v1.4.2`
+   * `Sketch` -> `Include Library` -> `Manage Libraries` -> Search for `TFT_eSPI`, install version `v2.5.22`
 6. Open ArduinoIDE  ,`Tools` , Make your selection based on the table above
 7. `File` -> `Examples` -> `LilyGo T-RGB` -> `Any Examples`
 8. Select `Port`， select you board port
@@ -139,8 +140,8 @@ Please enter the upload mode manually.
    5. Upload sketch
 
 2. If the above is invalid, burn the [binary file](./firmware/README.MD)  to check whether the hardware is normal
-3. If you use external power supply instead of USBC, please turn off the CDC option. This is because the board will wait for USB access when it starts.
-   * For Arduino IDE users, it can be turned off in the options , Please note that turning off USB CDC will turn off Serial redirection to USBC. At this time, you will not see any Serial message output when opening the port from USBC, but output from GPIO43 and GPIO44.
+3. If you use external power supply instead of USB-C, please turn off the CDC option. This is because the board will wait for USB access when it starts.
+   * For Arduino IDE users, it can be turned off in the options , Please note that turning off USB CDC will turn off Serial redirection to USB-C. At this time, you will not see any Serial message output when opening the port from USB-C, but output from GPIO43 and GPIO44.
 
     ```c
     Tools -> USB CDC On Boot -> Disable

@@ -22,6 +22,7 @@ jobs:
           - examples/lv_benchmark/lv_benchmark.ino
           - examples/lv_factory/lv_factory.ino
           - examples/lv_helloworld/lv_helloworld.ino
+          - examples/DeepSleep/DeepSleep.ino
           - examples/lv_gif/lv_gif.ino
           - examples/lv_slider/lv_slider.ino
           - examples/lv_images/lv_images.ino

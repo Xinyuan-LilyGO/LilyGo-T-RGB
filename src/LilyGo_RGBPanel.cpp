@@ -20,7 +20,9 @@ static const lcd_init_cmd_t *_init_cmd = NULL;
 LilyGo_RGBPanel::LilyGo_RGBPanel(/* args */) :
     _brightness(0), _panelDrv(NULL), _touchDrv(NULL),
     _order(LILYGO_T_RGB_ORDER_RGB),
-    _has_init(false)
+    _has_init(false),
+    _wakeupMethod(LILYGO_T_RGB_WAKEUP_FORM_BUTTON),
+    _sleepTimeUs(0)
 {
 }
 
@@ -157,16 +159,92 @@ LilyGo_RGBPanel_Type LilyGo_RGBPanel::getModel()
     return LILYGO_T_RGB_UNKNOWN;
 }
 
+void LilyGo_RGBPanel::enableTouchWakeup()
+{
+    _wakeupMethod = LILYGO_T_RGB_WAKEUP_FORM_TOUCH;
+}
+
+void LilyGo_RGBPanel::enableButtonWakeup()
+{
+    _wakeupMethod = LILYGO_T_RGB_WAKEUP_FORM_BUTTON;
+
+}
+
+void LilyGo_RGBPanel::enableTimerWakeup(uint64_t time_in_us)
+{
+    _wakeupMethod = LILYGO_T_RGB_WAKEUP_FORM_TIMER;
+    _sleepTimeUs = time_in_us;
+}
+
+// The sleep method tested CST820 and GT911, and the FTxxxx series should also be usable.
 void LilyGo_RGBPanel::sleep()
 {
-    if (_touchDrv) {
-        _touchDrv->sleep();
+    //turn off blacklight
+    for (int i = _brightness; i >= 0; --i) {
+        setBrightness(i);
+        delay(30);
+    }
+
+    if (LILYGO_T_RGB_WAKEUP_FORM_TOUCH != _wakeupMethod) {
+        if (_touchDrv) {
+            if (getModel() == LILYGO_T_RGB_2_8_INCHES) {
+                pinMode(BOARD_TOUCH_IRQ, OUTPUT);
+                digitalWrite(BOARD_TOUCH_IRQ, LOW); //Before touch to set sleep, it is necessary to set INT to LOW
+            }
+            _touchDrv->sleep();
+        }
+    }
+
+    switch (_wakeupMethod) {
+    case LILYGO_T_RGB_WAKEUP_FORM_TOUCH: {
+        int16_t x_array[1];
+        int16_t y_array[1];
+        uint8_t get_point = 1;
+        pinMode(BOARD_TOUCH_IRQ, INPUT);
+        // Wait for your finger to be lifted from the screen
+        while (!digitalRead(BOARD_TOUCH_IRQ)) {
+            delay(100);
+            // Clear touch buffer
+            getPoint(x_array, y_array, get_point);
+        }
+        // Wait for the interrupt level to stabilize
+        delay(2000);
+        // Set touch irq wakeup
+        esp_sleep_enable_ext1_wakeup(_BV(BOARD_TOUCH_IRQ), ESP_EXT1_WAKEUP_ALL_LOW);
+    }
+    break;
+    case LILYGO_T_RGB_WAKEUP_FORM_BUTTON:
+        esp_sleep_enable_ext1_wakeup(_BV(0), ESP_EXT1_WAKEUP_ALL_LOW);
+        break;
+    case LILYGO_T_RGB_WAKEUP_FORM_TIMER:
+        esp_sleep_enable_timer_wakeup(_sleepTimeUs);
+        break;
+    default:
+        // Default GPIO0 Wakeup
+        esp_sleep_enable_ext1_wakeup(_BV(0), ESP_EXT1_WAKEUP_ALL_LOW);
+        break;
+    }
+
+
+    if (_panelDrv) {
+        esp_lcd_panel_disp_off(_panelDrv, true);
+        esp_lcd_panel_del(_panelDrv);
     }
 
     Wire.end();
 
     pinMode(BOARD_I2C_SDA, OPEN_DRAIN);
     pinMode(BOARD_I2C_SCL, OPEN_DRAIN);
+
+    Serial.end();
+
+    // If the SD card is initialized, it needs to be unmounted.
+    if (SD_MMC.cardSize()) {
+        SD_MMC.end();
+    }
+
+    // Enter sleep
+    esp_deep_sleep_start();
 
 }
 
@@ -386,7 +464,7 @@ bool LilyGo_RGBPanel::initTouch()
     _touchDrv = new TouchDrvGT911();
     _touchDrv->setGpioCallback(TouchDrvPinMode, TouchDrvDigitalWrite, TouchDrvDigitalRead);
     _touchDrv->setPins(touch_reset_pin, touch_irq_pin);
-    result = _touchDrv->begin(Wire, GT911_SLAVE_ADDRESS_H, BOARD_I2C_SDA, BOARD_I2C_SCL);
+    result = _touchDrv->begin(Wire, GT911_SLAVE_ADDRESS_L, BOARD_I2C_SDA, BOARD_I2C_SCL);
     if (result) {
         TouchDrvGT911 *tmp = static_cast<TouchDrvGT911 *>(_touchDrv);
         tmp->setInterruptMode(FALLING);

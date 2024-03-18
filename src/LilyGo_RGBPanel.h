@@ -41,13 +41,18 @@ enum LilyGo_RGBPanel_Color_Order {
     LILYGO_T_RGB_ORDER_BGR,
 };
 
+enum LilyGo_RGBPanel_Wakeup_Method {
+    LILYGO_T_RGB_WAKEUP_FORM_TOUCH,
+    LILYGO_T_RGB_WAKEUP_FORM_BUTTON,
+    LILYGO_T_RGB_WAKEUP_FORM_TIMER,
+};
 
 class LilyGo_RGBPanel : public LilyGo_Display
 {
 
 public:
     LilyGo_RGBPanel();
-    
+
     ~LilyGo_RGBPanel();
 
     bool begin(LilyGo_RGBPanel_Color_Order  order = LILYGO_T_RGB_ORDER_RGB);
@@ -61,6 +66,10 @@ public:
     uint8_t getBrightness();
 
     LilyGo_RGBPanel_Type getModel();
+
+    void enableTouchWakeup();
+    void enableButtonWakeup();
+    void enableTimerWakeup(uint64_t time_in_us);
 
     void sleep();
 
@@ -99,6 +108,9 @@ private:
 
     bool _has_init;
 
+    LilyGo_RGBPanel_Wakeup_Method _wakeupMethod;
+
+    uint64_t _sleepTimeUs;
 
     ExtensionIOXL9555::ExtensionGPIO cs = ExtensionIOXL9555::IO3;
     ExtensionIOXL9555::ExtensionGPIO mosi = ExtensionIOXL9555::IO4;

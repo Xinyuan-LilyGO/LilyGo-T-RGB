@@ -67,6 +67,8 @@ public:
 
     LilyGo_RGBPanel_Type getModel();
 
+    const char *getTouchModelName();
+
     void enableTouchWakeup();
     void enableButtonWakeup();
     void enableTimerWakeup(uint64_t time_in_us);

@@ -159,6 +159,14 @@ LilyGo_RGBPanel_Type LilyGo_RGBPanel::getModel()
     return LILYGO_T_RGB_UNKNOWN;
 }
 
+const char *LilyGo_RGBPanel::getTouchModelName()
+{
+    if (_touchDrv) {
+        return _touchDrv->getModelName();
+    }
+    return "UNKNOWN";
+}
+
 void LilyGo_RGBPanel::enableTouchWakeup()
 {
     _wakeupMethod = LILYGO_T_RGB_WAKEUP_FORM_TOUCH;

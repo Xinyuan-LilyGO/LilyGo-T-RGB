@@ -34,12 +34,12 @@
     {
       "owner": "lvgl",
       "name": "lvgl",
-      "version": "8.3.9"
+      "version": "8.3.11"
     },
     {
       "owner": "lewisxhe",
       "name": "SensorLib",
-      "version": "0.1.6"
+      "version": "0.1.8"
     },
     {
       "owner": "bodmer",

@@ -52,7 +52,7 @@ jobs:
           mkdir -p $HOME/Arduino/libraries ;
           cd $HOME/Arduino/libraries ;
           git clone -b release/v8.3 https://github.com/lvgl/lvgl.git
-          git clone -b v0.1.5 https://github.com/lewisxhe/SensorLib.git
+          git clone -b v0.1.8 https://github.com/lewisxhe/SensorLib.git
           git clone -b v2.5.33 https://github.com/Bodmer/TFT_eSPI.git
           git clone -b v1.4.2 https://github.com/moononournation/Arduino_GFX.git
 

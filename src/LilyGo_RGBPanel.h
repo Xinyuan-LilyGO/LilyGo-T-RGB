@@ -35,6 +35,12 @@ enum LilyGo_RGBPanel_Type {
     LILYGO_T_RGB_2_8_INCHES,
 };
 
+enum LilyGo_RGBPanel_TouchType {
+    LILYGO_T_RGB_TOUCH_UNKNOWN,
+    LILYGO_T_RGB_TOUCH_FT3267,
+    LILYGO_T_RGB_TOUCH_CST820,
+    LILYGO_T_RGB_TOUCH_GT911,
+};
 
 enum LilyGo_RGBPanel_Color_Order {
     LILYGO_T_RGB_ORDER_RGB,
@@ -113,6 +119,8 @@ private:
     LilyGo_RGBPanel_Wakeup_Method _wakeupMethod;
 
     uint64_t _sleepTimeUs;
+
+    LilyGo_RGBPanel_TouchType _touchType;
 
     ExtensionIOXL9555::ExtensionGPIO cs = ExtensionIOXL9555::IO3;
     ExtensionIOXL9555::ExtensionGPIO mosi = ExtensionIOXL9555::IO4;

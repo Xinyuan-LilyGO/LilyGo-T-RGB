@@ -22,7 +22,8 @@ LilyGo_RGBPanel::LilyGo_RGBPanel(/* args */) :
     _order(LILYGO_T_RGB_ORDER_RGB),
     _has_init(false),
     _wakeupMethod(LILYGO_T_RGB_WAKEUP_FORM_BUTTON),
-    _sleepTimeUs(0)
+    _sleepTimeUs(0),
+    _touchType(LILYGO_T_RGB_TOUCH_UNKNOWN)
 {
 }
 
@@ -67,6 +68,8 @@ bool LilyGo_RGBPanel::begin(LilyGo_RGBPanel_Color_Order  order)
     }
 
     initBUS();
+
+    getModel();
 
     return true;
 }
@@ -149,10 +152,13 @@ LilyGo_RGBPanel_Type LilyGo_RGBPanel::getModel()
         if (model == NULL)return LILYGO_T_RGB_UNKNOWN;
         if (strlen(model) == 0)return LILYGO_T_RGB_UNKNOWN;
         if (strcmp(model, "FT3267") == 0) {
+            _touchType = LILYGO_T_RGB_TOUCH_FT3267;
             return LILYGO_T_RGB_2_1_INCHES;
         } else if (strcmp(model, "CST820") == 0) {
+            _touchType = LILYGO_T_RGB_TOUCH_CST820;
             return LILYGO_T_RGB_2_1_INCHES;
         } else if (strcmp(model, "GT911") == 0) {
+            _touchType = LILYGO_T_RGB_TOUCH_GT911;
             return LILYGO_T_RGB_2_8_INCHES;
         }
     }
@@ -274,6 +280,14 @@ uint16_t  LilyGo_RGBPanel::height()
 uint8_t LilyGo_RGBPanel::getPoint(int16_t *x_array, int16_t *y_array, uint8_t get_point)
 {
     if (_touchDrv) {
+
+        // The FT3267 type touch reading INT level is to read the coordinates after pressing
+        // The CST820 interrupt level is not continuous, so the register must be read all the time to obtain continuous coordinates.
+        if (_touchType == LILYGO_T_RGB_TOUCH_FT3267) {
+            if (!_touchDrv->isPressed()) {
+                return 0;
+            }
+        }
         uint8_t touched =  _touchDrv->getPoint(x_array, y_array, get_point);
         return touched;
     }
@@ -490,6 +504,9 @@ bool LilyGo_RGBPanel::initTouch()
     if (result) {
 
         _init_cmd = st7701_2_1_inches;
+
+        TouchDrvFT6X36 *tmp = static_cast<TouchDrvFT6X36 *>(_touchDrv);
+        tmp->interruptTrigger();
 
 #if ARDUHAL_LOG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
         const char *model = _touchDrv->getModelName();

@@ -30,7 +30,14 @@ void setup(void)
     lv_obj_set_style_text_font(label, &lv_font_montserrat_20, 0);
     lv_obj_center(label);
 
+    const char *touchModel =  panel.getTouchModelName();
+    lv_obj_t *model = lv_label_create(lv_scr_act());
+    lv_label_set_text(model, touchModel);
+    lv_obj_set_style_text_font(model, &lv_font_montserrat_20, 0);
+    lv_obj_align_to(model, label, LV_ALIGN_OUT_TOP_MID, 0, 0);
+
     lv_task_handler();
+
     panel.setBrightness(16);
 }
 

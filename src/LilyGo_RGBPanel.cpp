@@ -305,7 +305,7 @@ bool LilyGo_RGBPanel::isPressed()
 uint16_t LilyGo_RGBPanel::getBattVoltage()
 {
     esp_adc_cal_characteristics_t adc_chars;
-    esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &adc_chars);
+    esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_12, ADC_WIDTH_BIT_12, 1100, &adc_chars);
 
     const int number_of_samples = 20;
     uint32_t sum = 0;
@@ -497,26 +497,6 @@ bool LilyGo_RGBPanel::initTouch()
     }
     delete _touchDrv;
 
-    _touchDrv = new TouchDrvFT6X36();
-    _touchDrv->setGpioCallback(TouchDrvPinMode, TouchDrvDigitalWrite, TouchDrvDigitalRead);
-    _touchDrv->setPins(touch_reset_pin, touch_irq_pin);
-    result = _touchDrv->begin(Wire, FT3267_SLAVE_ADDRESS, BOARD_I2C_SDA, BOARD_I2C_SCL);
-    if (result) {
-
-        _init_cmd = st7701_2_1_inches;
-
-        TouchDrvFT6X36 *tmp = static_cast<TouchDrvFT6X36 *>(_touchDrv);
-        tmp->interruptTrigger();
-
-#if ARDUHAL_LOG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
-        const char *model = _touchDrv->getModelName();
-        log_i("Successfully initialized %s, using %s Driver!\n", model, model);
-#endif
-
-        return true;
-    }
-    delete _touchDrv;
-
     log_e("Unable to find touch device.");
 
     _touchDrv = NULL;
@@ -550,6 +530,13 @@ void LilyGo_RGBPanel::pushColors(uint16_t x, uint16_t y, uint16_t width, uint16_
 {
     assert(_panelDrv);
     esp_lcd_panel_draw_bitmap(_panelDrv, x, y, width, hight, data);
+}
+
+void LilyGo_RGBPanel::setMirror(bool mirror_x, bool mirror_y)
+{
+    assert(_panelDrv);
+    _mirror_x = mirror_x;
+    _mirror_y = mirror_y;
 }
 
 

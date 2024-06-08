@@ -68,6 +68,7 @@ public:
     void uninstallSD();
 
     void setBrightness(uint8_t level);
+    void setMirror(bool mirror_x, bool mirror_y);
 
     uint8_t getBrightness();
 
@@ -109,6 +110,8 @@ private:
 
     esp_lcd_panel_handle_t _panelDrv;
 
+    bool _mirror_x;
+    bool _mirror_y;
 
     TouchDrvInterface *_touchDrv;
 

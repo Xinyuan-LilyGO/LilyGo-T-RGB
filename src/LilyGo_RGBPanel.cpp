@@ -6,10 +6,13 @@
  * @date      2024-01-22
  *
  */
-#include <esp_adc_cal.h>
 #include "LilyGo_RGBPanel.h"
 #include "RGBPanelInit.h"
 #include "utilities.h"
+
+#if ESP_ARDUINO_VERSION <  ESP_ARDUINO_VERSION_VAL(3,0,0)
+#include <esp_adc_cal.h>
+#endif
 
 static void TouchDrvDigitalWrite(uint32_t gpio, uint8_t level);
 static int TouchDrvDigitalRead(uint32_t gpio);
@@ -304,12 +307,12 @@ bool LilyGo_RGBPanel::isPressed()
 
 uint16_t LilyGo_RGBPanel::getBattVoltage()
 {
-    esp_adc_cal_characteristics_t adc_chars;
-    esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &adc_chars);
-
+#if ESP_ARDUINO_VERSION <  ESP_ARDUINO_VERSION_VAL(3,0,0)
     const int number_of_samples = 20;
     uint32_t sum = 0;
     uint16_t raw_buffer[number_of_samples] = {0};
+    esp_adc_cal_characteristics_t adc_chars;
+    esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &adc_chars);
     for (int i = 0; i < number_of_samples; i++) {
         raw_buffer[i] =  analogRead(BOARD_ADC_DET);
         delay(2);
@@ -318,8 +321,12 @@ uint16_t LilyGo_RGBPanel::getBattVoltage()
         sum += raw_buffer[i];
     }
     sum = sum / number_of_samples;
-
     return esp_adc_cal_raw_to_voltage(sum, &adc_chars) * 2;
+#else
+    uint32_t v1 = analogReadMilliVolts(BOARD_ADC_DET);
+    v1 *= 2;   //The hardware voltage divider resistor is half of the actual voltage, multiply it by 2 to get the true voltage
+    return v1;
+#endif
 }
 
 void LilyGo_RGBPanel::initBUS()
@@ -411,6 +418,33 @@ void LilyGo_RGBPanel::initBUS()
         .vsync_gpio_num = BOARD_TFT_VSYNC,
         .de_gpio_num = BOARD_TFT_DE,
         .pclk_gpio_num = BOARD_TFT_PCLK,
+
+#if ESP_ARDUINO_VERSION >=   ESP_ARDUINO_VERSION_VAL(3,0,0)
+        .disp_gpio_num = GPIO_NUM_NC,
+        .data_gpio_nums =
+        {
+            // BOARD_TFT_DATA0,
+            BOARD_TFT_DATA13,
+            BOARD_TFT_DATA14,
+            BOARD_TFT_DATA15,
+            BOARD_TFT_DATA16,
+            BOARD_TFT_DATA17,
+
+            BOARD_TFT_DATA6,
+            BOARD_TFT_DATA7,
+            BOARD_TFT_DATA8,
+            BOARD_TFT_DATA9,
+            BOARD_TFT_DATA10,
+            BOARD_TFT_DATA11,
+            // BOARD_TFT_DATA12,
+
+            BOARD_TFT_DATA1,
+            BOARD_TFT_DATA2,
+            BOARD_TFT_DATA3,
+            BOARD_TFT_DATA4,
+            BOARD_TFT_DATA5,
+        },
+#else
         .data_gpio_nums =
         {
             // BOARD_TFT_DATA0,
@@ -437,6 +471,7 @@ void LilyGo_RGBPanel::initBUS()
         .disp_gpio_num = GPIO_NUM_NC,
         .on_frame_trans_done = NULL,
         .user_ctx = NULL,
+#endif
         .flags =
         {
             .fb_in_psram = 1, // allocate frame buffer in PSRAM

@@ -28,14 +28,29 @@ void setup()
     Serial.begin(115200);
 
 
-    // Use TFT_eSPI Sprite made by framebuffer , unnecessary calling during use tft.xxxx function
-    // Use TFT_eSPI sprites requires exchanging the color order
-    if (!panel.begin(LILYGO_T_RGB_ORDER_BGR)) {
+    //！ Use TFT_eSPI Sprite made by framebuffer , unnecessary calling during use tft.xxxx function
+    //！ Use TFT_eSPI sprites requires exchanging the color order
+
+    // Automatically determine the touch model to determine the initialization screen type. If touch is not available, it may fail.
+    bool rslt = panel.begin(LILYGO_T_RGB_ORDER_BGR);
+
+    // Specify 2.1-inch semicircular screen
+    // https://www.lilygo.cc/products/t-rgb?variant=42407295877301
+    // bool rslt = panel.begin(LILYGO_T_RGB_2_1_INCHES_HALF_CIRCLE,LILYGO_T_RGB_ORDER_BGR);
+
+    // Specified as a 2.1-inch full-circle screen
+    // https://www.lilygo.cc/products/t-rgb
+    // bool rslt = panel.begin(LILYGO_T_RGB_2_1_INCHES_FULL_CIRCLE,LILYGO_T_RGB_ORDER_BGR);
+
+    // Specified as a 2.8-inch full-circle screen
+    // https://www.lilygo.cc/products/t-rgb?variant=42880799441077
+    // bool rslt = panel.begin(LILYGO_T_RGB_2_8_INCHES,LILYGO_T_RGB_ORDER_BGR);
+
+    if (!rslt) {
         while (1) {
             Serial.println("Error, failed to initialize T-RGB"); delay(1000);
         }
     }
-
     spr.createSprite(WIDTH, HEIGHT);
 
     spr.setColorDepth(16);

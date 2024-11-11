@@ -43,12 +43,12 @@ LV_IMG_DECLARE(image_2_480x480);
 
 //Arduino IDE cannot select the partition table as default_16MB.csv. Delete the image to reduce the size.
 // In platformio it is not affected
-// LV_IMG_DECLARE(image_3_480x480);     
+// LV_IMG_DECLARE(image_3_480x480);
 
 const void *images_bg[] = {
     &image_1_480x480,
     &image_2_480x480,
-    // &image_3_480x480,    
+    // &image_3_480x480,
 };
 
 LilyGo_RGBPanel panel;
@@ -64,7 +64,7 @@ static void lv_backlight_gui(lv_obj_t *parent);
 static void lv_weather_gui(lv_obj_t *parent);
 static void lv_info_gui(lv_obj_t *parent);
 static void lv_factory_gui_init();
-static void lv_clock_gui(lv_obj_t *paran);
+static void lv_clock_gui(lv_obj_t *param);
 static void WiFiEvent(WiFiEvent_t event);
 static void datetimeSyncTask(void *ptr);
 static void lv_wifi_gui(lv_obj_t *parent);
@@ -76,8 +76,24 @@ void setup()
     xWiFiLock =  xSemaphoreCreateBinary();
     xSemaphoreGive( xWiFiLock );
 
-    // Initialize T-RGB, if the initialization fails, false will be returned.
-    if (!panel.begin()) {
+    //** Four initialization methods */
+
+    // Automatically determine the touch model to determine the initialization screen type. If touch is not available, it may fail.
+    bool rslt = panel.begin();
+
+    // Specify 2.1-inch semicircular screen
+    // https://www.lilygo.cc/products/t-rgb?variant=42407295877301
+    // bool rslt = panel.begin(LILYGO_T_RGB_2_1_INCHES_HALF_CIRCLE);
+
+    // Specified as a 2.1-inch full-circle screen
+    // https://www.lilygo.cc/products/t-rgb
+    // bool rslt = panel.begin(LILYGO_T_RGB_2_1_INCHES_FULL_CIRCLE);
+
+    // Specified as a 2.8-inch full-circle screen
+    // https://www.lilygo.cc/products/t-rgb?variant=42880799441077
+    // bool rslt = panel.begin(LILYGO_T_RGB_2_8_INCHES);
+
+    if (!rslt) {
         while (1) {
             Serial.println("Error, failed to initialize T-RGB"); delay(1000);
         }
@@ -108,10 +124,9 @@ void setup()
         Serial.println("[Error] : WiFi ssid and password are not configured correctly");
         Serial.println("[Error] : WiFi ssid and password are not configured correctly");
         Serial.println("[Error] : WiFi ssid and password are not configured correctly");
+    } else {
+        WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     }
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-
-
 }
 
 
@@ -476,9 +491,9 @@ static lv_obj_t *clock_meter;
 static lv_meter_indicator_t *indic_min ;
 static lv_meter_indicator_t *indic_hour;
 
-static void lv_clock_gui(lv_obj_t *paran)
+static void lv_clock_gui(lv_obj_t *param)
 {
-    clock_meter = lv_meter_create(paran);
+    clock_meter = lv_meter_create(param);
     lv_obj_set_size(clock_meter, LV_PCT(100), LV_PCT(100));
     lv_obj_center(clock_meter);
 

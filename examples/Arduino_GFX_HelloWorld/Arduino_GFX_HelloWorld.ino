@@ -11,7 +11,7 @@
 #define GFX_DEV_DEVICE LILYGO_T_RGB
 #include <Arduino_GFX_Library.h>
 #include <Wire.h>
-extern const uint8_t st7701_type9_init_operations[297];
+extern const uint8_t st7701_type20_init_operations[297];
 
 #define GFX_BL 46
 Arduino_DataBus *bus = new Arduino_XL9535SWSPI(8 /* SDA */, 48 /* SCL */, 2 /* XL PWD */, 3 /* XL CS */, 5 /* XL SCK */, 4 /* XL MOSI */);
@@ -25,14 +25,17 @@ Arduino_ESP32RGBPanel *rgbpanel = new Arduino_ESP32RGBPanel(
     1 /* pclk_active_neg */);
 
 // ! T-RGB 2.1 inches 
-// Arduino_RGB_Display     *gfx = new Arduino_RGB_Display(
-//     480 /* width */, 480 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */,
-//     bus, GFX_NOT_DEFINED /* RST */, st7701_type4_init_operations, sizeof(st7701_type4_init_operations));
-
-// ! T-RGB 2.8 inches Uncomment below
+// https://www.lilygo.cc/products/t-rgb?variant=42407295877301
+// https://www.lilygo.cc/products/t-rgb
 Arduino_RGB_Display     *gfx = new Arduino_RGB_Display(
     480 /* width */, 480 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */,
-    bus, GFX_NOT_DEFINED /* RST */, st7701_type9_init_operations, sizeof(st7701_type9_init_operations));
+    bus, GFX_NOT_DEFINED /* RST */, st7701_type4_init_operations, sizeof(st7701_type4_init_operations));
+
+// ! T-RGB 2.8 inches Uncomment below
+// https://www.lilygo.cc/products/t-rgb?variant=42880799441077
+// Arduino_RGB_Display     *gfx = new Arduino_RGB_Display(
+//     480 /* width */, 480 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */,
+//     bus, GFX_NOT_DEFINED /* RST */, st7701_type20_init_operations, sizeof(st7701_type20_init_operations));
 
 
 void setup(void)
@@ -72,7 +75,7 @@ void loop()
 
 
 // 2.8-inch initialization sequence
-const uint8_t st7701_type9_init_operations[297] = {
+const uint8_t st7701_type20_init_operations[297] = {
     BEGIN_WRITE,
 
     WRITE_COMMAND_8, 0xFF,

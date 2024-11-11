@@ -49,6 +49,8 @@ LV_IMG_DECLARE(img_lv_demo_music_btn_list_pause);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+LV_FONT_DECLARE(lv_font_montserrat_12);
+LV_FONT_DECLARE(lv_font_montserrat_16);
 
 lv_obj_t * _lv_demo_music_list_create(lv_obj_t * parent)
 {

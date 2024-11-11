@@ -121,6 +121,8 @@ static void _obj_set_x_anim_cb(void *obj, int32_t x)
     lv_obj_set_x((lv_obj_t *)obj, (lv_coord_t)x);
 }
 
+LV_FONT_DECLARE(lv_font_montserrat_12);
+LV_FONT_DECLARE(lv_font_montserrat_16);
 lv_obj_t *_lv_demo_music_main_create(lv_obj_t *parent)
 {
 #if LV_DEMO_MUSIC_LARGE

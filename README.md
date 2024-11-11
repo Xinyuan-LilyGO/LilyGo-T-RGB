@@ -73,7 +73,7 @@ examples/
 2. Install [Arduino ESP32 V 2.0.5 or above and below V3.0](https://docs.espressif.com/projects/arduino-esp32/en/latest/) 
 3. `Sketch` -> `Include Library` -> `Manage Libraries`
 4. `Library Search` -> `LilyGo T-RGB` -> `Install` -> `Install ALL`
-5. `Library Search` -> `lvgl` -> `v8.3.11` -> `Install`
+5. `Library Search` -> `lvgl` -> `v8.4.0` -> `Install`
 6. `File` -> `Examples` -> `LilyGo T-RGB` -> `Any Examples`
 7. `Tools` , Make your selection according to the table below
     | Arduino IDE Setting                  | Value                             |
@@ -101,7 +101,7 @@ examples/
 9. Click `upload` , Wait for compilation and writing to complete
 10. If it cannot be written, or the USB device keeps flashing, please check the **FAQ** below
 
-    **Note that T-RGB depends on lvgl v8.3.11 version. Currently lvgl has released lvgl v9.0 version. When compilation error occurs, please check whether lvgl belongs to v8.3.11**
+    **Note that T-RGB depends on lvgl v8.4.0 version. Currently lvgl has released lvgl v9.0 version. When compilation error occurs, please check whether lvgl belongs to v8.4.0**
 
 ## 5️⃣ Arduino IDE Manual installation
 
@@ -111,9 +111,9 @@ examples/
 4. Open ArduinoIDE  ,`Sketch` -> `Include Library` -> `Add .ZIP Library` -> Select `LilyGo T-RGB`
 5. Install dependent libraries
    * `Sketch` -> `Include Library` -> `Manage Libraries` -> Search for `SensorLib`, install version greater than `v0.1.6`
-   * `Sketch` -> `Include Library` -> `Manage Libraries` -> Search for `lvgl`, install version `v8.3.11`
-   * `Sketch` -> `Include Library` -> `Manage Libraries` -> Search for `GFX Library for Arduino`, install version `v1.4.2`
-   * `Sketch` -> `Include Library` -> `Manage Libraries` -> Search for `TFT_eSPI`, install version `v2.5.22`
+   * `Sketch` -> `Include Library` -> `Manage Libraries` -> Search for `lvgl`, install version `v8.4.0`
+   * `Sketch` -> `Include Library` -> `Manage Libraries` -> Search for `GFX Library for Arduino`, install version `v1.5.0`
+   * `Sketch` -> `Include Library` -> `Manage Libraries` -> Search for `TFT_eSPI`, install version `v2.5.43`
 6. Open ArduinoIDE  ,`Tools` , Make your selection based on the table above
 7. `File` -> `Examples` -> `LilyGo T-RGB` -> `Any Examples`
 8. Select `Port`， select you board port
@@ -182,6 +182,7 @@ Please enter the upload mode manually.
 # 8️⃣ Depends on required libraries
 
 * [SensorLib](https://github.com/lewisxhe/SensorsLib)
-* [lvgl 8.3.11](https://github.com/lvgl/lvgl)
+* [lvgl 8.4.0](https://github.com/lvgl/lvgl)
 
 * When using Arduino_GFX also depends on [Arduino_GFX](https://github.com/moononournation/Arduino_GFX)
+* When using TFT_eSPI also depends on [TFT_eSPI](https://github.com/Bodmer/TFT_eSPI)

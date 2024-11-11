@@ -31,7 +31,11 @@
 
 enum LilyGo_RGBPanel_Type {
     LILYGO_T_RGB_UNKNOWN,
-    LILYGO_T_RGB_2_1_INCHES,
+    // https://www.lilygo.cc/products/t-rgb?variant=42407295877301
+    LILYGO_T_RGB_2_1_INCHES_HALF_CIRCLE,
+    // https://www.lilygo.cc/products/t-rgb
+    LILYGO_T_RGB_2_1_INCHES_FULL_CIRCLE,
+    // https://www.lilygo.cc/products/t-rgb?variant=42880799441077
     LILYGO_T_RGB_2_8_INCHES,
 };
 
@@ -62,6 +66,8 @@ public:
     ~LilyGo_RGBPanel();
 
     bool begin(LilyGo_RGBPanel_Color_Order  order = LILYGO_T_RGB_ORDER_RGB);
+
+    bool begin(LilyGo_RGBPanel_Type type, LilyGo_RGBPanel_Color_Order  order = LILYGO_T_RGB_ORDER_RGB);
 
     bool installSD();
 
@@ -103,7 +109,9 @@ private:
 
     void initBUS();
 
-    bool initTouch();
+    LilyGo_RGBPanel_TouchType initTouch();
+
+    void initDevice();
 
     uint8_t _brightness;
 
@@ -121,6 +129,9 @@ private:
     uint64_t _sleepTimeUs;
 
     LilyGo_RGBPanel_TouchType _touchType;
+
+
+    LilyGo_RGBPanel_Type _panel_type;
 
     ExtensionIOXL9555::ExtensionGPIO cs = ExtensionIOXL9555::IO3;
     ExtensionIOXL9555::ExtensionGPIO mosi = ExtensionIOXL9555::IO4;

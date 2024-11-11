@@ -26,7 +26,8 @@ LilyGo_RGBPanel::LilyGo_RGBPanel(/* args */) :
     _has_init(false),
     _wakeupMethod(LILYGO_T_RGB_WAKEUP_FORM_BUTTON),
     _sleepTimeUs(0),
-    _touchType(LILYGO_T_RGB_TOUCH_UNKNOWN)
+    _touchType(LILYGO_T_RGB_TOUCH_UNKNOWN),
+    _panel_type(LILYGO_T_RGB_UNKNOWN)
 {
 }
 
@@ -42,14 +43,8 @@ LilyGo_RGBPanel::~LilyGo_RGBPanel()
     }
 }
 
-bool LilyGo_RGBPanel::begin(LilyGo_RGBPanel_Color_Order  order)
+void LilyGo_RGBPanel::initDevice()
 {
-    if (_panelDrv) {
-        return true;
-    }
-
-    _order = order;
-
     pinMode(BOARD_TFT_BL, OUTPUT);
     digitalWrite(BOARD_TFT_BL, LOW);
 
@@ -66,13 +61,51 @@ bool LilyGo_RGBPanel::begin(LilyGo_RGBPanel_Color_Order  order)
     extension.pinMode(power_enable, OUTPUT);
     extension.digitalWrite(power_enable, HIGH);
 
-    if (!initTouch()) {
-        Serial.println("Touch chip not found.");
+    LilyGo_RGBPanel_TouchType touchType = initTouch();
+    switch (touchType) {
+    case LILYGO_T_RGB_2_1_INCHES_HALF_CIRCLE:
+    case LILYGO_T_RGB_2_1_INCHES_FULL_CIRCLE:
+        _init_cmd = st7701_2_1_inches;
+        break;
+    case LILYGO_T_RGB_2_8_INCHES:
+        _init_cmd = st7701_2_8_inches;
+        break;
+    default:
+        log_d("Unable to detect touch type, please use  begin(LilyGo_RGBPanel_Type type, LilyGo_RGBPanel_Color_Order order) to specify the initialization screen type");
+        break;
     }
 
     initBUS();
 
     getModel();
+}
+
+
+bool LilyGo_RGBPanel::begin(LilyGo_RGBPanel_Color_Order  order)
+{
+    if (_panelDrv) {
+        return true;
+    }
+
+    _order = order;
+
+    initDevice();
+
+    return true;
+}
+
+
+bool LilyGo_RGBPanel::begin(LilyGo_RGBPanel_Type type, LilyGo_RGBPanel_Color_Order  order)
+{
+    if (_panelDrv) {
+        return true;
+    }
+
+    _panel_type = type;
+
+    _order = order;
+
+    initDevice();
 
     return true;
 }
@@ -156,10 +189,10 @@ LilyGo_RGBPanel_Type LilyGo_RGBPanel::getModel()
         if (strlen(model) == 0)return LILYGO_T_RGB_UNKNOWN;
         if (strcmp(model, "FT3267") == 0) {
             _touchType = LILYGO_T_RGB_TOUCH_FT3267;
-            return LILYGO_T_RGB_2_1_INCHES;
+            return LILYGO_T_RGB_2_1_INCHES_HALF_CIRCLE;
         } else if (strcmp(model, "CST820") == 0) {
             _touchType = LILYGO_T_RGB_TOUCH_CST820;
-            return LILYGO_T_RGB_2_1_INCHES;
+            return LILYGO_T_RGB_2_1_INCHES_FULL_CIRCLE;
         } else if (strcmp(model, "GT911") == 0) {
             _touchType = LILYGO_T_RGB_TOUCH_GT911;
             return LILYGO_T_RGB_2_8_INCHES;
@@ -495,7 +528,7 @@ void LilyGo_RGBPanel::initBUS()
     ESP_ERROR_CHECK(esp_lcd_panel_init(_panelDrv));
 }
 
-bool LilyGo_RGBPanel::initTouch()
+LilyGo_RGBPanel_TouchType LilyGo_RGBPanel::initTouch()
 {
     const uint8_t touch_reset_pin = tp_reset | 0x80;
     const uint8_t touch_irq_pin = BOARD_TOUCH_IRQ;
@@ -508,13 +541,14 @@ bool LilyGo_RGBPanel::initTouch()
     result = _touchDrv->begin(Wire, CST816_SLAVE_ADDRESS, BOARD_I2C_SDA, BOARD_I2C_SCL);
     if (result) {
 
-        _init_cmd = st7701_2_1_inches;
 
 #if ARDUHAL_LOG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
         const char *model = _touchDrv->getModelName();
         log_i("Successfully initialized %s, using %s Driver!\n", model, model);
 #endif
-        return true;
+        // _init_cmd = st7701_2_1_inches;
+        // return true;
+        return LILYGO_T_RGB_TOUCH_CST820;
     }
     delete _touchDrv;
 
@@ -526,9 +560,10 @@ bool LilyGo_RGBPanel::initTouch()
         TouchDrvGT911 *tmp = static_cast<TouchDrvGT911 *>(_touchDrv);
         tmp->setInterruptMode(FALLING);
 
-        _init_cmd = st7701_2_8_inches;
         log_i("Successfully initialized GT911, using GT911 Driver!");
-        return true;
+        // _init_cmd = st7701_2_8_inches;
+        // return true;
+        return LILYGO_T_RGB_TOUCH_GT911;
     }
     delete _touchDrv;
 
@@ -538,7 +573,6 @@ bool LilyGo_RGBPanel::initTouch()
     result = _touchDrv->begin(Wire, FT3267_SLAVE_ADDRESS, BOARD_I2C_SDA, BOARD_I2C_SCL);
     if (result) {
 
-        _init_cmd = st7701_2_1_inches;
 
         TouchDrvFT6X36 *tmp = static_cast<TouchDrvFT6X36 *>(_touchDrv);
         tmp->interruptTrigger();
@@ -548,7 +582,9 @@ bool LilyGo_RGBPanel::initTouch()
         log_i("Successfully initialized %s, using %s Driver!\n", model, model);
 #endif
 
-        return true;
+        // _init_cmd = st7701_2_1_inches;
+        // return true;
+        return LILYGO_T_RGB_TOUCH_FT3267;
     }
     delete _touchDrv;
 
@@ -557,9 +593,9 @@ bool LilyGo_RGBPanel::initTouch()
     _touchDrv = NULL;
 
     // If touch does not exist, add a default initialization sequence
-    _init_cmd = st7701_2_1_inches;
-
-    return false;
+    // _init_cmd = st7701_2_1_inches;
+    // return false;
+    return LILYGO_T_RGB_TOUCH_UNKNOWN;
 }
 
 void LilyGo_RGBPanel::writeCommand(const uint8_t cmd)

@@ -11,7 +11,7 @@
 
 
 #if LV_VERSION_CHECK(9,0,0)
-#error "Currently not supported 9.x"
+#error "Currently not supported 9.x , Select Arduino option ->  `Library Search` -> `lvgl` -> `v8.4.0` -> `Install` solve " 
 #endif
 
 static lv_disp_draw_buf_t draw_buf;

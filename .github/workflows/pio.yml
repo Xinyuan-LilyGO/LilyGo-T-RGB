@@ -30,6 +30,8 @@ jobs:
           - examples/TFT_eSPI_Sprite
           - examples/Touchpad
           - examples/DeepSleep
+          - examples/AdjustBacklight
+          - examples/Arduino_GFX_HelloWorld
 
     steps:
       - uses: actions/checkout@v3

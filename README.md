@@ -163,6 +163,7 @@ Please enter the upload mode manually.
 7. T-RGB has no free GPIO and cannot be expanded
 8. T-RGB hardware connects to RGB666 screens, but ESP32 currently only supports RGB565
 9. `Serial.println` has no output. Please refer to the third step of the FAQ to set `USB CDC On Boot` to **Enable**.
+10. Which model of Grove interface cable should be used on T-RGB? Please see [issue](https://github.com/Xinyuan-LilyGO/LilyGo-T-RGB/issues/72)
 
 
 

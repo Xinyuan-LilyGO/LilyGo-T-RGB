@@ -15,6 +15,14 @@
 #include <esp_adc_cal.h>
 #endif
 
+#if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(2,0,17)
+#define WAKEUP_LEVEL_SETTING       ESP_EXT1_WAKEUP_ANY_LOW
+#define ADC_ATTEN_DB               ADC_ATTEN_DB_12
+#else
+#define WAKEUP_LEVEL_SETTING       ESP_EXT1_WAKEUP_ALL_LOW
+#define ADC_ATTEN_DB               ADC_ATTEN_DB_11
+#endif
+
 static void TouchDrvDigitalWrite(uint32_t gpio, uint8_t level);
 static int TouchDrvDigitalRead(uint32_t gpio);
 static void TouchDrvPinMode(uint32_t gpio, uint8_t mode);
@@ -278,18 +286,18 @@ void LilyGo_RGBPanel::sleep()
         // Wait for the interrupt level to stabilize
         delay(2000);
         // Set touch irq wakeup
-        esp_sleep_enable_ext1_wakeup(_BV(BOARD_TOUCH_IRQ), ESP_EXT1_WAKEUP_ALL_LOW);
+        esp_sleep_enable_ext1_wakeup(_BV(BOARD_TOUCH_IRQ), WAKEUP_LEVEL_SETTING);
     }
     break;
     case LILYGO_T_RGB_WAKEUP_FORM_BUTTON:
-        esp_sleep_enable_ext1_wakeup(_BV(0), ESP_EXT1_WAKEUP_ALL_LOW);
+        esp_sleep_enable_ext1_wakeup(_BV(0), WAKEUP_LEVEL_SETTING);
         break;
     case LILYGO_T_RGB_WAKEUP_FORM_TIMER:
         esp_sleep_enable_timer_wakeup(_sleepTimeUs);
         break;
     default:
         // Default GPIO0 Wakeup
-        esp_sleep_enable_ext1_wakeup(_BV(0), ESP_EXT1_WAKEUP_ALL_LOW);
+        esp_sleep_enable_ext1_wakeup(_BV(0), WAKEUP_LEVEL_SETTING);
         break;
     }
 
@@ -363,7 +371,7 @@ uint16_t LilyGo_RGBPanel::getBattVoltage()
     uint32_t sum = 0;
     uint16_t raw_buffer[number_of_samples] = {0};
     esp_adc_cal_characteristics_t adc_chars;
-    esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &adc_chars);
+    esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB, ADC_WIDTH_BIT_12, 1100, &adc_chars);
     for (int i = 0; i < number_of_samples; i++) {
         raw_buffer[i] =  analogRead(BOARD_ADC_DET);
         delay(2);

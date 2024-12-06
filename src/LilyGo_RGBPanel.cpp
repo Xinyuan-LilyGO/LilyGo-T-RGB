@@ -9,6 +9,7 @@
 #include "LilyGo_RGBPanel.h"
 #include "RGBPanelInit.h"
 #include "utilities.h"
+#include "SensorWireHelper.h"
 
 #if ESP_ARDUINO_VERSION <  ESP_ARDUINO_VERSION_VAL(3,0,0)
 #include <esp_adc_cal.h>
@@ -62,7 +63,8 @@ void LilyGo_RGBPanel::initDevice()
     extension.digitalWrite(power_enable, HIGH);
 
     LilyGo_RGBPanel_TouchType touchType = initTouch();
-    switch (touchType) {
+
+    switch (_panel_type) {
     case LILYGO_T_RGB_2_1_INCHES_HALF_CIRCLE:
     case LILYGO_T_RGB_2_1_INCHES_FULL_CIRCLE:
         _init_cmd = st7701_2_1_inches;
@@ -70,9 +72,25 @@ void LilyGo_RGBPanel::initDevice()
     case LILYGO_T_RGB_2_8_INCHES:
         _init_cmd = st7701_2_8_inches;
         break;
-    default:
+    default: {
+        switch (touchType) {
+        case LILYGO_T_RGB_2_1_INCHES_HALF_CIRCLE:
+        case LILYGO_T_RGB_2_1_INCHES_FULL_CIRCLE:
+            _init_cmd = st7701_2_1_inches;
+            break;
+        case LILYGO_T_RGB_2_8_INCHES:
+            _init_cmd = st7701_2_8_inches;
+            break;
+        default:
+            break;
+        }
+    }
+    break;
+    }
+
+    if (touchType == LILYGO_T_RGB_TOUCH_UNKNOWN) {
+        SensorWireHelper::dumpDevices(Wire);
         log_d("Unable to detect touch type, please use  begin(LilyGo_RGBPanel_Type type, LilyGo_RGBPanel_Color_Order order) to specify the initialization screen type");
-        break;
     }
 
     initBUS();

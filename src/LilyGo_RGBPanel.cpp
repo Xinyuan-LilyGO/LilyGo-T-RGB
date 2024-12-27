@@ -77,6 +77,10 @@ void LilyGo_RGBPanel::initDevice()
     case LILYGO_T_RGB_2_1_INCHES_FULL_CIRCLE:
         _init_cmd = st7701_2_1_inches;
         break;
+    case LILYGO_T_RGB_2_1_INCHES_HALF_CIRCLE_V2:
+    case LILYGO_T_RGB_2_1_INCHES_FULL_CIRCLE_V2:
+        _init_cmd = st7701_2_1_inches_rev2;
+        break;
     case LILYGO_T_RGB_2_8_INCHES:
         _init_cmd = st7701_2_8_inches;
         break;
@@ -452,6 +456,29 @@ void LilyGo_RGBPanel::initBUS()
         BOARD_TFT_DATA11,
     };
 
+    const int bus_rbg_panel_v2[SOC_LCD_RGB_DATA_WIDTH] = {
+        BOARD_TFT_DATA12,
+        BOARD_TFT_DATA13,
+        BOARD_TFT_DATA14,
+        BOARD_TFT_DATA15,
+        BOARD_TFT_DATA16,
+        // BOARD_TFT_DATA17,
+
+        BOARD_TFT_DATA6,
+        BOARD_TFT_DATA7,
+        BOARD_TFT_DATA8,
+        BOARD_TFT_DATA9,
+        BOARD_TFT_DATA10,
+        BOARD_TFT_DATA11,
+
+        BOARD_TFT_DATA0,
+        BOARD_TFT_DATA1,
+        BOARD_TFT_DATA2,
+        BOARD_TFT_DATA3,
+        BOARD_TFT_DATA4,
+        // BOARD_TFT_DATA5,
+    };
+
     esp_lcd_rgb_panel_config_t panel_config = {
         .clk_src = LCD_CLK_SRC_PLL160M,
         .timings =
@@ -537,6 +564,25 @@ void LilyGo_RGBPanel::initBUS()
         },
     };
 
+    switch (_panel_type) {
+    case LILYGO_T_RGB_2_1_INCHES_HALF_CIRCLE_V2:
+    case LILYGO_T_RGB_2_1_INCHES_FULL_CIRCLE_V2:
+        panel_config.timings.pclk_hz = 10000000UL;
+        panel_config.timings.h_res = BOARD_TFT_WIDTH;
+        panel_config.timings.v_res = BOARD_TFT_HEIGHT;
+        panel_config.timings.hsync_pulse_width = 2;
+        panel_config.timings.hsync_back_porch = 34;
+        panel_config.timings.hsync_front_porch = 20;
+        panel_config.timings.vsync_pulse_width = 2;
+        panel_config.timings.vsync_back_porch = 20;
+        panel_config.timings.vsync_front_porch = 50;
+        memcpy(panel_config.data_gpio_nums, bus_rbg_panel_v2,
+               sizeof(panel_config.data_gpio_nums));
+        break;
+    default:
+        break;
+    }
+
     if (_order == LILYGO_T_RGB_ORDER_BGR) {
 
         // Swap color order
@@ -584,7 +630,8 @@ LilyGo_RGBPanel_TouchType LilyGo_RGBPanel::initTouch()
     result = _touchDrv->begin(Wire, GT911_SLAVE_ADDRESS_L, BOARD_I2C_SDA, BOARD_I2C_SCL);
     if (result) {
         TouchDrvGT911 *tmp = static_cast<TouchDrvGT911 *>(_touchDrv);
-        tmp->setInterruptMode(FALLING);
+        // Do not modify the touch interrupt mode, as this may cause touch failure
+        // tmp->setInterruptMode(FALLING);
 
         log_i("Successfully initialized GT911, using GT911 Driver!");
         // _init_cmd = st7701_2_8_inches;

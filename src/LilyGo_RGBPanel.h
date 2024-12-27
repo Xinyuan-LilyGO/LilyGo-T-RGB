@@ -37,6 +37,9 @@ enum LilyGo_RGBPanel_Type {
     LILYGO_T_RGB_2_1_INCHES_FULL_CIRCLE,
     // https://www.lilygo.cc/products/t-rgb?variant=42880799441077
     LILYGO_T_RGB_2_8_INCHES,
+
+    LILYGO_T_RGB_2_1_INCHES_HALF_CIRCLE_V2,
+    LILYGO_T_RGB_2_1_INCHES_FULL_CIRCLE_V2,
 };
 
 enum LilyGo_RGBPanel_TouchType {

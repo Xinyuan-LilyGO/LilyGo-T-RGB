@@ -67,7 +67,7 @@ void loop()
 
 static void slider_event_cb(lv_event_t *e)
 {
-    lv_obj_t *slider = lv_event_get_target(e);
+    lv_obj_t *slider = (lv_obj_t *)lv_event_get_target(e);
     char buf[8];
     lv_snprintf(buf, sizeof(buf), "%d%%", (int)lv_slider_get_value(slider));
     lv_label_set_text(slider_label, buf);

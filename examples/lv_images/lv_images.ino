@@ -108,7 +108,7 @@ void setup()
         Serial.print("open : ");
         Serial.println(path);
 
-        lv_img_set_src((lv_obj_t *)t->user_data, path.c_str());
+        lv_img_set_src((lv_obj_t *)lv_timer_get_user_data(t), path.c_str());
         i++;
         i %= sizeof(filename) / sizeof(filename[0]);
     }, 5000, img);

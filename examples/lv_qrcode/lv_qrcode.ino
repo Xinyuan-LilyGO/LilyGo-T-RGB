@@ -48,8 +48,14 @@ void setup()
     lv_color_t bg_color = lv_color_white();//lv_palette_lighten(LV_PALETTE_LIGHT_BLUE, 5);
     lv_color_t fg_color = lv_color_black();//lv_palette_darken(LV_PALETTE_BLUE, 4);
 
+#if LVGL_VERSION_MAJOR == 9
+    lv_obj_t *qr = lv_qrcode_create(lv_screen_active());
+    lv_qrcode_set_size(qr, 150);
+    lv_qrcode_set_dark_color(qr, fg_color);
+    lv_qrcode_set_light_color(qr, bg_color);
+#else
     lv_obj_t *qr = lv_qrcode_create(lv_scr_act(), 200, fg_color, bg_color);
-
+#endif
     /*Set data*/
     const char *data = "https://www.lilygo.cc/";
     lv_qrcode_update(qr, data, strlen(data));

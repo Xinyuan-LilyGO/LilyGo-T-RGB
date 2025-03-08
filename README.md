@@ -6,9 +6,9 @@
 
 # News🏳️‍🌈
 
+- `LilyGo-T-RGB` is currently compatible with lvgl9, but there is only one `lvgl 9.x.x` example, and the rest of the examples are still based on `lvgl 8.x.x`. Please confirm the lvgl version before using the examples. How to change the lvgl version please see the following description
 - How to integrate **LilyGo-T-RGB** in your own project, please refer to [issue](https://github.com/Xinyuan-LilyGO/LilyGo-T-RGB/issues/43)
 - `LilyGo-T-RGB` esp-idf version example, please jump to this [LilyGo-Display-IDF](https://github.com/Xinyuan-LilyGO/LilyGo-Display-IDF)
-*  `LilyGo-T-RGB` depends on lvgl **v8.3.x** version. Currently lvgl has released lvgl **v9.0** version. When compilation error occurs, please check whether lvgl belongs to **v8.3.x** 
 
 ## 1️⃣Support Product
 
@@ -30,10 +30,10 @@
 
 ## 2️⃣Use reference
 
-|   Product   |                             Youtube  link                             |                  explanation                    | Status | 
-| :---------: | :-------------------------------------------------------------------: |:-----------------------------------------------:| :----: |
-| T -RGB | [Youtube link](https://www.youtube.com/watch?v=hndA0D3F3ug&t=3s) |    How to quickly port to LILYGO T-RGB using Squareline Studio     |   ✅    |
-| LilyGo device | [Youtube link](https://www.youtube.com/watch?v=f3BybP3L7ls) |    How to enter boot mode to download the firmware     |   ✅    |
+|    Product    |                          Youtube  link                           |                         explanation                         | Status |
+| :-----------: | :--------------------------------------------------------------: | :---------------------------------------------------------: | :----: |
+|    T -RGB     | [Youtube link](https://www.youtube.com/watch?v=hndA0D3F3ug&t=3s) | How to quickly port to LILYGO T-RGB using Squareline Studio |   ✅    |
+| LilyGo device |   [Youtube link](https://www.youtube.com/watch?v=f3BybP3L7ls)    |       How to enter boot mode to download the firmware       |   ✅    |
 
 
 ## 3️⃣Examples
@@ -172,24 +172,31 @@ Please enter the upload mode manually.
 8. T-RGB hardware connects to RGB666 screens, but ESP32 currently only supports RGB565
 9. `Serial.println` has no output. Please refer to the third step of the FAQ to set `USB CDC On Boot` to **Enable**.
 
+# 9️⃣. lvgl 9 Upgrade Guide
+
+1. Find `LilyGo-T-RGB` in the library installation directory and enter the `src` directory
+2. Rename `lv_conf.h` to `lv_conf.h.v8`
+3. Rename `lv_conf.h.v9` to `lv_conf.h`
+4. Open `Arduino IDE` -> `File` -> `examples`- > `lvgl_version_9`
+5. Currently there is only one example, `lvgl_version_9`, and other examples are based on `lvgl 8`, please note.
 
 
-## 9️⃣ Resource
+## 🔟 Resource
 
 * [schematic](./schematic/T-RGB.pdf)
 * [Dimensions](./dimensions/T-RGB-PCB.DXF)
 * [PCB 3D](./dimensions/T-RGB-FULL-3D.stp)
 
-## 🔟T-RGB datasheet
+## 11 T-RGB datasheet
 
 * [ST7701S Driver datasheet](./datasheet/ST7701S_SPEC_%20V1.1.pdf)
 * [FT3267](./datasheet/FT3267-DataSheet.pdf)
 * [GT911](./datasheet/GT911%20Datasheet.pdf.pdf)
 * [ESP32S3-R8](https://www.espressif.com.cn/en/support/documents/technical-documents?keys=&field_type_tid%5B%5D=842)
 
-# 11 Depends on required libraries
+# 12 Depends on required libraries
 
-* [SensorLib](https://github.com/lewisxhe/SensorsLib)
-* [lvgl 8.3.11](https://github.com/lvgl/lvgl)
+* [SensorLib v0.2.3](https://github.com/lewisxhe/SensorsLib)
+* [lvgl v8.4.0 or lvgl v9.x.x](https://github.com/lvgl/lvgl)
 
 * When using Arduino_GFX also depends on [Arduino_GFX](https://github.com/moononournation/Arduino_GFX)

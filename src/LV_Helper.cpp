@@ -9,10 +9,7 @@
 #include <Arduino.h>
 #include "LV_Helper.h"
 
-
-#if LV_VERSION_CHECK(9,0,0)
-#error "Currently not supported 9.x , Select Arduino option ->  `Library Search` -> `lvgl` -> `v8.4.0` -> `Install` solve " 
-#endif
+#if LVGL_VERSION_MAJOR == 8
 
 static lv_disp_draw_buf_t draw_buf;
 static lv_disp_drv_t disp_drv;
@@ -100,3 +97,5 @@ void beginLvglHelper(LilyGo_Display &board, bool debug)
     indev_drv.user_data = &board;
     lv_indev_drv_register( &indev_drv );
 }
+#endif
+

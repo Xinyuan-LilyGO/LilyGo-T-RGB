@@ -82,6 +82,7 @@ examples/
 3. `Sketch` -> `Include Library` -> `Manage Libraries`
 4. `Library Search` -> `LilyGo T-RGB` -> `Install` -> `Install ALL`
 5. `Library Search` -> `lvgl` -> `v8.3.11` -> `Install`
+5. `Library Search` -> `SensorLib` -> `v0.2.3` -> `Install`
 6. `File` -> `Examples` -> `LilyGo T-RGB` -> `Any Examples`
 7. `Tools` , Make your selection according to the table below
     | Arduino IDE Setting                  | Value                             |
@@ -118,7 +119,7 @@ examples/
 3. Download `LilyGo T-RGB`
 4. Open ArduinoIDE  ,`Sketch` -> `Include Library` -> `Add .ZIP Library` -> Select `LilyGo T-RGB`
 5. Install dependent libraries
-   * `Sketch` -> `Include Library` -> `Manage Libraries` -> Search for `SensorLib`, install version greater than `v0.1.6`
+   * `Sketch` -> `Include Library` -> `Manage Libraries` -> Search for `SensorLib`, install version greater than `v0.2.3`
    * `Sketch` -> `Include Library` -> `Manage Libraries` -> Search for `lvgl`, install version `v8.3.11`
    * `Sketch` -> `Include Library` -> `Manage Libraries` -> Search for `GFX Library for Arduino`, install version `v1.4.2`
    * `Sketch` -> `Include Library` -> `Manage Libraries` -> Search for `TFT_eSPI`, install version `v2.5.22`

@@ -147,4 +147,10 @@ private:
 };
 
 
+#ifdef SENSORLIB_VERSION_MINOR
+#if SENSORLIB_VERSION_MINOR >= 3
+#error "Please roll back SensorLib to v0.2.3"
+#endif
+#endif
+
 
